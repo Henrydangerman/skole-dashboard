@@ -50,6 +50,8 @@ render();
 const gamesModal=el("gamesModal"),gameMenu=el("gameMenu"),flappyScreen=el("flappyScreen");
 const canvas=el("flappyCanvas"),ctx=canvas.getContext("2d");
 let birdY=205,velocity=0,pipes=[],score=0,frame=0,gameState="ready",lastFrame=0,raf=0;
+const bestScoreKey="skoleboard-flappy-best-v1";let bestScore=0;try{bestScore=Math.max(0,Number(localStorage.getItem(bestScoreKey))||0)}catch{}
+function saveBestScore(){if(score>bestScore){bestScore=score;try{localStorage.setItem(bestScoreKey,String(bestScore))}catch{}}}
 function resetFlappy(){birdY=205;velocity=0;pipes=[];score=0;frame=0;gameState="ready";lastFrame=0;drawFlappy()}
 function flap(){if(flappyScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;if(gameState==="over"){resetFlappy();gameState="playing"}else if(gameState==="ready")gameState="playing";velocity=-5.4}
 function drawFlappy(){
@@ -65,13 +67,14 @@ function drawFlappy(){
  ctx.fillStyle="#152a43";ctx.beginPath();ctx.arc(8,-5,2.5,0,Math.PI*2);ctx.fill();
  ctx.fillStyle="#ff8d27";ctx.beginPath();ctx.moveTo(14,1);ctx.lineTo(28,6);ctx.lineTo(14,10);ctx.fill();ctx.restore();
  ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 29px system-ui";ctx.fillText(String(score),180,43);
+ ctx.textAlign="right";ctx.fillStyle="#0b3561";ctx.font="bold 16px system-ui";ctx.fillText("🏆 Rekord: "+bestScore,346,27);
  if(gameState!=="playing"){ctx.fillStyle="#071c3bbb";ctx.fillRect(35,160,290,105);ctx.fillStyle="white";ctx.font="bold 23px system-ui";ctx.fillText(gameState==="over"?"Spillet er slut!":"Flappy Bird",180,201);ctx.font="15px system-ui";ctx.fillText(gameState==="over"?"Klik for at prøve igen":"Klik eller tryk for at starte",180,232)}
 }
 function gameLoop(t){if(gamesModal.classList.contains("hidden")||flappyScreen.classList.contains("hidden")){raf=0;return}
  if(!lastFrame)lastFrame=t;const dt=Math.min((t-lastFrame)/16.667,2);lastFrame=t;
  if(gameState==="playing"){frame+=dt;velocity+=.28*dt;birdY+=velocity*dt;
  if(pipes.length===0||pipes[pipes.length-1].x<175)pipes.push({x:370,gap:125+Math.random()*180,passed:false});
- for(const p of pipes){p.x-=2.25*dt;if(!p.passed&&p.x+55<83){p.passed=true;score++}
+ for(const p of pipes){p.x-=2.25*dt;if(!p.passed&&p.x+55<83){p.passed=true;score++;saveBestScore()}
  if(83+12>p.x&&83-12<p.x+55&&(birdY-12<p.gap-76||birdY+12>p.gap+76))gameState="over"}
  pipes=pipes.filter(p=>p.x>-65);if(birdY<15||birdY>425)gameState="over"}
  drawFlappy();raf=requestAnimationFrame(gameLoop)}
