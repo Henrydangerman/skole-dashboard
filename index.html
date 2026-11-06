@@ -5,7 +5,17 @@
 <title>SkoleBoard · Mine links</title>
 <style>
 :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#07152c;color:#f1f6ff}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#123d79 0%,transparent 42%),#07152c}button,input{font:inherit}button{cursor:pointer}main{margin-left:0;padding:38px;max-width:1400px}.muted{color:#a9c1dd}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.top h2{font-size:32px;margin:5px 0 12px}.primary{background:#2777e8;border:0;color:white;border-radius:11px;padding:12px 17px;font-weight:600}.ghost{background:#203d65;border:0;color:#e7e8f9;border-radius:9px;padding:8px 12px}.danger{background:#4b2739;border:0;color:#ffc3d1;border-radius:9px;padding:8px 12px}.panel{background:#10294c;border:1px solid #27517d;border-radius:19px;padding:23px;margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:17px;margin-top:24px}.linkcard{background:#112f56;border:1px solid #2c5683;border-radius:18px;padding:19px;min-height:165px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .15s,border-color .15s}.linkcard:hover{transform:translateY(-3px);border-color:#62a9ff}.linkcard a{color:inherit;text-decoration:none;display:flex;gap:13px;align-items:center;overflow-wrap:anywhere}.symbol{width:47px;height:47px;display:grid;place-items:center;border-radius:13px;background:#174a86;color:#c4e0ff;font-size:22px;flex-shrink:0}.linkcard strong{font-size:17px}.linkcard small{display:block;color:#a9c1dd;margin-top:6px;word-break:break-all}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:17px}input{width:100%;padding:12px;background:#081d38;color:#fff;border:1px solid #39618a;border-radius:10px;margin:7px 0 15px}label{display:block;font-weight:600}form{max-width:580px}.hidden{display:none}.empty{text-align:center;padding:55px 20px;color:#a9c1dd}.tip{font-size:13px;color:#9fa8c9}.pill{padding:7px 11px;background:#123c72;color:#d7c5ff;border-radius:20px;font-size:13px}@media(max-width:750px){main{margin:0;padding:22px}.top h2{font-size:26px}}
-#date{font-size:clamp(25px,3vw,38px);font-weight:750;letter-spacing:-.02em;color:#e2efff;margin:0 0 16px}#clock{font-size:clamp(34px,5vw,58px);font-weight:750;font-variant-numeric:tabular-nums;letter-spacing:.025em;color:#75b9ff;margin:0 0 12px}.symbol img{width:32px;height:32px;object-fit:contain;border-radius:6px}</style>
+#date{font-size:clamp(25px,3vw,38px);font-weight:750;letter-spacing:-.02em;color:#e2efff;margin:0 0 16px}#clock{font-size:clamp(34px,5vw,58px);font-weight:750;font-variant-numeric:tabular-nums;letter-spacing:.025em;color:#75b9ff;margin:0 0 12px}.symbol img{width:32px;height:32px;object-fit:contain;border-radius:6px}
+#gamesToggle{position:fixed;right:22px;bottom:22px;z-index:20;border:1px solid #69b2ff;border-radius:18px;background:#2176e6;color:white;padding:15px 19px;font-weight:750;box-shadow:0 12px 35px #0007}
+#gamesModal{position:fixed;inset:0;z-index:30;background:#020a18c9;display:flex;align-items:center;justify-content:center;padding:18px}
+#gamesModal.hidden{display:none}
+.gamesWindow{background:#0e2749;border:1px solid #3a6ca4;border-radius:22px;padding:22px;width:min(100%,460px);max-height:95vh;overflow:auto;box-shadow:0 25px 80px #0009}
+.gamesHeader{display:flex;justify-content:space-between;align-items:center;gap:12px}.gamesHeader h2{margin:0}
+#gameMenu{padding:20px 0}#gameMenu button{width:100%;padding:18px;text-align:left}
+#flappyScreen.hidden,#gameMenu.hidden{display:none}
+#flappyCanvas{display:block;width:min(100%,360px);height:auto;aspect-ratio:360/440;border-radius:14px;margin:12px auto;background:#76caff;touch-action:manipulation;cursor:pointer}
+.gameHint{text-align:center;color:#bad8ff;font-size:14px}#backToGames{margin-top:10px}
+</style>
 </head>
 <body>
 <main>
@@ -13,6 +23,15 @@
 <section id="editor" class="panel hidden"><h3 id="formTitle">Tilføj website</h3><form id="form"><label for="name">Navn</label><input id="name" maxlength="80" placeholder="Fx Aula" required><label for="url">Link til hjemmesiden</label><input id="url" type="url" placeholder="https://..." required><div><button class="primary" type="submit">Gem website</button> <button class="ghost" id="cancel" type="button">Annuller</button></div></form></section>
 <section id="cards" class="grid"></section>
 </main>
+
+<button id="gamesToggle" type="button" aria-label="Åbn spil">🎮 Spil</button>
+<div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
+ <div class="gamesWindow">
+  <div class="gamesHeader"><h2>🎮 Spil</h2><button id="closeGames" class="ghost" type="button" aria-label="Luk spil">✕</button></div>
+  <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button></div>
+  <div id="flappyScreen" class="hidden"><canvas id="flappyCanvas" width="360" height="440" aria-label="Flappy Bird spil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på spillet for at flyve. Tryk igen for at starte forfra.</p><button id="backToGames" class="ghost" type="button">← Tilbage til spil</button></div>
+ </div>
+</div>
 <script>
 const storageKey="skolehub-links-v1";const defaults=[{id:"default-aula",name:"Aula",url:"https://www.aula.dk/"},{id:"default-meebook",name:"Meebook",url:"https://www.meebook.com/"},{id:"default-classroom",name:"Google Classroom",url:"https://classroom.google.com/"}];let links=[];try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");if(Array.isArray(saved))links=saved.filter(x=>x&&typeof x.name==="string"&&typeof x.url==="string");else links=[...defaults]}catch{links=[...defaults]}for(const item of defaults){if(!links.some(x=>x.id===item.id||x.name.toLowerCase()===item.name.toLowerCase()))links.push(item)}localStorage.setItem(storageKey,JSON.stringify(links));let editing=null;
 const el=id=>document.getElementById(id);
@@ -27,5 +46,35 @@ function closeEditor(){editing=null;el("editor").classList.add("hidden");el("for
 el("addBtn").onclick=()=>openEditor();el("cancel").onclick=closeEditor;
 el("form").onsubmit=e=>{e.preventDefault();const name=el("name").value.trim();let url=el("url").value.trim();if(!valid(url)){alert("Indtast et gyldigt http- eller https-link.");return}if(!name)return;if(editing){const x=links.find(x=>x.id===editing);if(x){x.name=name;x.url=url}}else links.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),name,url});save();closeEditor();render()};
 render();
+
+const gamesModal=el("gamesModal"),gameMenu=el("gameMenu"),flappyScreen=el("flappyScreen");
+const canvas=el("flappyCanvas"),ctx=canvas.getContext("2d");
+let birdY=205,velocity=0,pipes=[],score=0,frame=0,gameState="ready",lastFrame=0,raf=0;
+function resetFlappy(){birdY=205;velocity=0;pipes=[];score=0;frame=0;gameState="ready";lastFrame=0;drawFlappy()}
+function flap(){if(flappyScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;if(gameState==="over"){resetFlappy();gameState="playing"}else if(gameState==="ready")gameState="playing";velocity=-5.4}
+function drawFlappy(){
+ ctx.clearRect(0,0,360,440);ctx.fillStyle="#83d4ff";ctx.fillRect(0,0,360,440);
+ ctx.fillStyle="#e4f6ff";for(let i=0;i<4;i++){let x=(i*125+40-frame*.3)%480;if(x< -60)x+=480;ctx.beginPath();ctx.ellipse(x,75+i%2*45,35,13,0,0,Math.PI*2);ctx.fill()}
+ for(const p of pipes){ctx.fillStyle="#32a951";ctx.fillRect(p.x,0,55,p.gap-76);ctx.fillRect(p.x,p.gap+76,55,440-p.gap-76);ctx.fillStyle="#23883d";ctx.fillRect(p.x-4,p.gap-94,63,18);ctx.fillRect(p.x-4,p.gap+76,63,18)}
+ ctx.fillStyle="#ffd73d";ctx.beginPath();ctx.arc(83,birdY,15,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(89,birdY-5,6,0,Math.PI*2);ctx.fill();ctx.fillStyle="#152a43";ctx.beginPath();ctx.arc(91,birdY-5,2.5,0,Math.PI*2);ctx.fill();ctx.fillStyle="#ff8d27";ctx.beginPath();ctx.moveTo(97,birdY+1);ctx.lineTo(111,birdY+6);ctx.lineTo(97,birdY+10);ctx.fill();
+ ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 29px system-ui";ctx.fillText(String(score),180,43);
+ if(gameState!=="playing"){ctx.fillStyle="#071c3bbb";ctx.fillRect(35,160,290,105);ctx.fillStyle="white";ctx.font="bold 23px system-ui";ctx.fillText(gameState==="over"?"Spillet er slut!":"Flappy Bird",180,201);ctx.font="15px system-ui";ctx.fillText(gameState==="over"?"Klik for at prøve igen":"Klik eller tryk for at starte",180,232)}
+}
+function gameLoop(t){if(gamesModal.classList.contains("hidden")||flappyScreen.classList.contains("hidden")){raf=0;return}
+ if(!lastFrame)lastFrame=t;const dt=Math.min((t-lastFrame)/16.667,2);lastFrame=t;
+ if(gameState==="playing"){frame+=dt;velocity+=.28*dt;birdY+=velocity*dt;
+ if(pipes.length===0||pipes[pipes.length-1].x<175)pipes.push({x:370,gap:125+Math.random()*180,passed:false});
+ for(const p of pipes){p.x-=2.25*dt;if(!p.passed&&p.x+55<83){p.passed=true;score++}
+ if(83+12>p.x&&83-12<p.x+55&&(birdY-12<p.gap-76||birdY+12>p.gap+76))gameState="over"}
+ pipes=pipes.filter(p=>p.x>-65);if(birdY<15||birdY>425)gameState="over"}
+ drawFlappy();raf=requestAnimationFrame(gameLoop)}
+function startLoop(){if(!raf)raf=requestAnimationFrame(gameLoop)}
+el("gamesToggle").onclick=()=>{gamesModal.classList.remove("hidden");gameMenu.classList.remove("hidden");flappyScreen.classList.add("hidden")};
+el("closeGames").onclick=()=>{gamesModal.classList.add("hidden");gameState="ready"};
+el("playFlappy").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.remove("hidden");resetFlappy();startLoop()};
+el("backToGames").onclick=()=>{flappyScreen.classList.add("hidden");gameMenu.classList.remove("hidden");gameState="ready"};
+canvas.addEventListener("pointerdown",flap);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!gamesModal.classList.contains("hidden")){gamesModal.classList.add("hidden");gameState="ready"}if(e.code==="Space"&&!flappyScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();flap()}});
+gamesModal.addEventListener("click",e=>{if(e.target===gamesModal){gamesModal.classList.add("hidden");gameState="ready"}});
 </script>
 </body></html>
