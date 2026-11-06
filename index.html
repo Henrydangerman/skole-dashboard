@@ -56,7 +56,14 @@ function drawFlappy(){
  ctx.clearRect(0,0,360,440);ctx.fillStyle="#83d4ff";ctx.fillRect(0,0,360,440);
  ctx.fillStyle="#e4f6ff";for(let i=0;i<4;i++){let x=(i*125+40-frame*.3)%480;if(x< -60)x+=480;ctx.beginPath();ctx.ellipse(x,75+i%2*45,35,13,0,0,Math.PI*2);ctx.fill()}
  for(const p of pipes){ctx.fillStyle="#32a951";ctx.fillRect(p.x,0,55,p.gap-76);ctx.fillRect(p.x,p.gap+76,55,440-p.gap-76);ctx.fillStyle="#23883d";ctx.fillRect(p.x-4,p.gap-94,63,18);ctx.fillRect(p.x-4,p.gap+76,63,18)}
- ctx.fillStyle="#ffd73d";ctx.beginPath();ctx.arc(83,birdY,15,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(89,birdY-5,6,0,Math.PI*2);ctx.fill();ctx.fillStyle="#152a43";ctx.beginPath();ctx.arc(91,birdY-5,2.5,0,Math.PI*2);ctx.fill();ctx.fillStyle="#ff8d27";ctx.beginPath();ctx.moveTo(97,birdY+1);ctx.lineTo(111,birdY+6);ctx.lineTo(97,birdY+10);ctx.fill();
+ const tilt=Math.max(-.55,Math.min(1.15,velocity*.095));ctx.save();ctx.translate(83,birdY);ctx.rotate(tilt);
+ ctx.fillStyle="#ffd73d";ctx.beginPath();ctx.arc(0,0,15,0,Math.PI*2);ctx.fill();
+ const wingLift=gameState==="playing"?Math.sin(frame*.42)*5:0;
+ ctx.fillStyle="#f3b82f";ctx.beginPath();ctx.ellipse(-7,4+wingLift,9,5.5,-.35,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle="#d99518";ctx.lineWidth=1.5;ctx.stroke();
+ ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(6,-5,6,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#152a43";ctx.beginPath();ctx.arc(8,-5,2.5,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#ff8d27";ctx.beginPath();ctx.moveTo(14,1);ctx.lineTo(28,6);ctx.lineTo(14,10);ctx.fill();ctx.restore();
  ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 29px system-ui";ctx.fillText(String(score),180,43);
  if(gameState!=="playing"){ctx.fillStyle="#071c3bbb";ctx.fillRect(35,160,290,105);ctx.fillStyle="white";ctx.font="bold 23px system-ui";ctx.fillText(gameState==="over"?"Spillet er slut!":"Flappy Bird",180,201);ctx.font="15px system-ui";ctx.fillText(gameState==="over"?"Klik for at prøve igen":"Klik eller tryk for at starte",180,232)}
 }
