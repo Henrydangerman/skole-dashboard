@@ -16,7 +16,7 @@
 <div class="panel"><strong>💡 Tip</strong><p class="muted">Tryk på “Tilføj website” for at samle dine skolelinks. Klik på et kort for at åbne hjemmesiden i en ny fane.</p></div>
 </main>
 <script>
-const storageKey="skolehub-links-v1";let links=[];try{const saved=JSON.parse(localStorage.getItem(storageKey)||"[]");if(Array.isArray(saved))links=saved.filter(x=>x&&typeof x.name==="string"&&typeof x.url==="string")}catch{}let editing=null;
+const storageKey="skolehub-links-v1";const defaults=[{id:"default-aula",name:"Aula",url:"https://www.aula.dk/"},{id:"default-meebook",name:"Meebook",url:"https://www.meebook.com/"},{id:"default-classroom",name:"Google Classroom",url:"https://classroom.google.com/"}];let links=[];try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");if(Array.isArray(saved))links=saved.filter(x=>x&&typeof x.name==="string"&&typeof x.url==="string");else links=[...defaults]}catch{links=[...defaults]}for(const item of defaults){if(!links.some(x=>x.id===item.id||x.name.toLowerCase()===item.name.toLowerCase()))links.push(item)}localStorage.setItem(storageKey,JSON.stringify(links));let editing=null;
 const el=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const valid=u=>{try{const p=new URL(u);return ["https:","http:"].includes(p.protocol)}catch{return false}};
