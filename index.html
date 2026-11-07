@@ -31,7 +31,7 @@
   <div class="gamesHeader"><h2>🎮 Spil</h2><button id="closeGames" class="ghost" type="button" aria-label="Luk spil">✕</button></div>
   <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button><button id="playDash" class="primary" type="button" style="margin-top:12px;background:#198eac">🟩 Geometry Dash – Spil nu</button></div>
   <div id="flappyScreen" class="hidden"><canvas id="flappyCanvas" width="360" height="440" aria-label="Flappy Bird spil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på spillet for at flyve. Tryk igen for at starte forfra.</p><button id="backToGames" class="ghost" type="button">← Tilbage til spil</button></div>
-  <div id="dashScreen" class="hidden"><canvas id="dashCanvas" width="360" height="440" aria-label="Geometry Dash spil"></canvas><p class="gameHint">Hop over piggene med mellemrum, klik eller tryk på spillet. Tryk igen for at starte forfra.</p><button id="backFromDash" class="ghost" type="button">← Tilbage til spil</button></div>
+  <div id="dashScreen" class="hidden"><canvas id="dashCanvas" width="360" height="440" aria-label="Geometry Dash spil"></canvas><p class="gameHint">Cube: tryk for at hoppe. Ship: hold for at flyve op. Wave: hold for at flyve skråt op, slip for at flyve ned.</p><button id="backFromDash" class="ghost" type="button">← Tilbage til spil</button></div>
  </div>
 </div>
 <script>
@@ -101,53 +101,56 @@ canvas.addEventListener("pointerdown",flap);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!gamesModal.classList.contains("hidden")){gamesModal.classList.add("hidden");gameState="ready"}if(e.code==="Space"&&!flappyScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();flap()}});
 
 
+
 const dashScreen=el("dashScreen"),dashCanvas=el("dashCanvas"),dc=dashCanvas.getContext("2d");
-const dashGround=345,dashSpeed=3.65,dashFinish=6200;
-const dashLayout=[
- [530,"spike"],[790,"spike"],[1050,"spike"],[1084,"spike"],
- [1380,"block"],[1580,"spike"],[1810,"spike"],[1844,"spike"],
- [2150,"block"],[2190,"block"],[2460,"spike"],[2690,"spike"],[2724,"spike"],
- [3020,"block"],[3260,"spike"],[3500,"spike"],[3534,"spike"],
- [3850,"block"],[3890,"block"],[4150,"spike"],[4400,"spike"],[4434,"spike"],
- [4740,"block"],[4980,"spike"],[5210,"spike"],[5244,"spike"],[5510,"block"],[5780,"spike"]
-];
-let dashY=0,dashV=0,dashAngle=0,dashFrame=0,dashState="ready",dashLast=0,dashRaf=0,dashBest=0,dashProgress=0;
+const dashGround=345,dashSpeed=3.65,dashFinish=6600;
+const dashLayout=[[530,"spike"],[790,"spike"],[1050,"spike"],[1084,"spike"],[1380,"block"],[1580,"spike"],[1810,"spike"],[1844,"spike"],[2150,"block"],[2190,"block"],[2460,"spike"],[2690,"spike"],[2724,"spike"],[5520,"spike"],[5760,"block"],[6020,"spike"],[6250,"spike"],[6284,"spike"]];
+const dashPortals=[[2900,"ship"],[4200,"wave"],[5350,"cube"]];
+const dashAirHazards=[[3360,145],[3740,235],[4570,165],[4950,235]];
+let dashY=0,dashV=0,dashAngle=0,dashFrame=0,dashState="ready",dashLast=0,dashRaf=0,dashBest=0,dashProgress=0,dashMode="cube",dashHolding=false,dashTrail=[];
 try{dashBest=Math.max(0,Number(localStorage.getItem("skoleboard-geometry-best-v1"))||0)}catch{}
-function resetDash(){dashY=0;dashV=0;dashAngle=0;dashFrame=0;dashProgress=0;dashState="ready";dashLast=0;drawDash()}
+function resetDash(){dashY=0;dashV=0;dashAngle=0;dashFrame=0;dashProgress=0;dashMode="cube";dashHolding=false;dashTrail=[];dashState="ready";dashLast=0;drawDash()}
 function dashJump(){if(dashScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;
  if(dashState==="over"||dashState==="won"){resetDash();dashState="playing"}
  else if(dashState==="ready")dashState="playing";
- if(dashY>=-.1)dashV=-11.8}
+ dashHolding=true;if(dashMode==="cube"&&dashY>=-.1)dashV=-11.8}
+function dashRelease(){dashHolding=false}
 function drawDash(){
  const W=360,H=440,g=dashGround;dc.clearRect(0,0,W,H);
- const bg=dc.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#082c65");bg.addColorStop(1,"#1b79b5");dc.fillStyle=bg;dc.fillRect(0,0,W,H);
- dc.strokeStyle="#ffffff19";dc.lineWidth=1;for(let x=-(dashFrame*dashSpeed*.5)%40;x<W;x+=40){dc.beginPath();dc.moveTo(x,0);dc.lineTo(x,g);dc.stroke()}
- for(let y=0;y<g;y+=40){dc.beginPath();dc.moveTo(0,y);dc.lineTo(W,y);dc.stroke()}
+ const bg=dc.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#082c65");bg.addColorStop(1,dashMode==="wave"?"#54239b":"#1b79b5");dc.fillStyle=bg;dc.fillRect(0,0,W,H);
+ dc.strokeStyle="#ffffff19";dc.lineWidth=1;for(let x=-(dashFrame*dashSpeed*.5)%40;x<W;x+=40){dc.beginPath();dc.moveTo(x,0);dc.lineTo(x,g);dc.stroke()}for(let y=0;y<g;y+=40){dc.beginPath();dc.moveTo(0,y);dc.lineTo(W,y);dc.stroke()}
  dc.fillStyle="#0a376d";dc.fillRect(0,g,W,H-g);dc.fillStyle="#65e5ff";dc.fillRect(0,g,W,5);
- for(const [pos,type] of dashLayout){const x=pos-dashFrame*dashSpeed+83;if(x < -60||x>W+60)continue;
- dc.lineWidth=2;dc.strokeStyle="#e8fcff";
+ const worldX=dashFrame*dashSpeed;
+ for(const [pos,type] of dashLayout){const x=pos-worldX+83;if(x < -60||x>W+60)continue;dc.lineWidth=2;dc.strokeStyle="#e8fcff";
  if(type==="spike"){dc.fillStyle="#102c64";dc.beginPath();dc.moveTo(x,g);dc.lineTo(x+17,g-34);dc.lineTo(x+34,g);dc.closePath();dc.fill();dc.stroke()}
  else{dc.fillStyle="#1765b4";dc.fillRect(x,g-40,40,40);dc.strokeRect(x,g-40,40,40);dc.strokeRect(x+8,g-32,24,24)}}
- dc.save();dc.translate(83,g-16+dashY);dc.rotate(dashAngle);dc.fillStyle="#75ff64";dc.strokeStyle="#fff";dc.lineWidth=3;dc.fillRect(-16,-16,32,32);dc.strokeRect(-16,-16,32,32);
- dc.fillStyle="#113854";dc.fillRect(-9,-7,6,7);dc.fillRect(4,-7,6,7);dc.fillRect(-5,5,11,4);dc.restore();
+ for(const [pos,y] of dashAirHazards){const x=pos-worldX+83;if(x< -35||x>395)continue;dc.fillStyle="#ff4a9c";dc.strokeStyle="white";dc.lineWidth=2;dc.beginPath();dc.moveTo(x,y-15);dc.lineTo(x+15,y);dc.lineTo(x,y+15);dc.lineTo(x-15,y);dc.closePath();dc.fill();dc.stroke()}
+ for(const [pos,mode] of dashPortals){const x=pos-worldX+83;if(x< -40||x>400)continue;dc.save();dc.translate(x,185);dc.shadowBlur=18;dc.shadowColor=mode==="ship"?"#ffca42":mode==="wave"?"#e26cff":"#62ff9b";dc.strokeStyle=dc.shadowColor;dc.lineWidth=6;dc.beginPath();dc.ellipse(0,0,17,62,0,0,Math.PI*2);dc.stroke();dc.shadowBlur=0;dc.fillStyle="#fff";dc.textAlign="center";dc.font="bold 12px system-ui";dc.fillText(mode.toUpperCase(),0,-75);dc.restore()}
+ const py=g-16+dashY;
+ if(dashMode==="wave"&&dashTrail.length>1){dc.strokeStyle="#f3a5ff";dc.lineWidth=3;dc.beginPath();dashTrail.forEach((p,i)=>{const x=83-(worldX-p.x);if(i===0)dc.moveTo(x,p.y);else dc.lineTo(x,p.y)});dc.stroke()}
+ dc.save();dc.translate(83,py);dc.rotate(dashAngle);dc.strokeStyle="#fff";dc.lineWidth=2.5;
+ if(dashMode==="cube"){dc.fillStyle="#75ff64";dc.fillRect(-16,-16,32,32);dc.strokeRect(-16,-16,32,32);dc.fillStyle="#113854";dc.fillRect(-9,-7,6,7);dc.fillRect(4,-7,6,7);dc.fillRect(-5,5,11,4)}
+ else if(dashMode==="ship"){dc.fillStyle="#ffbd45";dc.beginPath();dc.moveTo(19,0);dc.lineTo(-14,-12);dc.lineTo(-9,0);dc.lineTo(-14,12);dc.closePath();dc.fill();dc.stroke();dc.fillStyle="#6ce7ff";dc.fillRect(-4,-5,9,10);dc.fillStyle="#ff694a";dc.fillRect(-21,-4,8,8)}
+ else{dc.fillStyle="#ee8aff";dc.beginPath();dc.moveTo(16,0);dc.lineTo(-12,-13);dc.lineTo(-6,0);dc.lineTo(-12,13);dc.closePath();dc.fill();dc.stroke()}
+ dc.restore();
  dc.fillStyle="#ffffff44";dc.fillRect(16,17,328,8);dc.fillStyle="#6effe5";dc.fillRect(16,17,328*dashProgress/100,8);
- dc.textAlign="right";dc.fillStyle="#fff";dc.font="bold 16px system-ui";dc.fillText(dashProgress+"%",344,48);
- dc.textAlign="left";dc.fillText("🏆 "+dashBest+"%",16,48);
- if(dashState!=="playing"){dc.fillStyle="#061b41d9";dc.fillRect(24,147,312,118);dc.fillStyle="#fff";dc.textAlign="center";dc.font="bold 23px system-ui";dc.fillText(dashState==="won"?"LEVEL GENNEMFØRT!":dashState==="over"?"PRØV IGEN":"GEOMETRY DASH",180,190);dc.font="15px system-ui";dc.fillText(dashState==="won"?"100% gennemført":dashState==="over"?"Klik for at starte forfra":"Klik eller tryk for at hoppe",180,227)}
+ dc.textAlign="right";dc.fillStyle="#fff";dc.font="bold 16px system-ui";dc.fillText(dashProgress+"%",344,48);dc.textAlign="left";dc.fillText("🏆 "+dashBest+"%",16,48);
+ dc.font="bold 14px system-ui";dc.fillText("Mode: "+dashMode.toUpperCase(),16,70);
+ if(dashState!=="playing"){dc.fillStyle="#061b41d9";dc.fillRect(24,147,312,118);dc.fillStyle="#fff";dc.textAlign="center";dc.font="bold 23px system-ui";dc.fillText(dashState==="won"?"LEVEL GENNEMFØRT!":dashState==="over"?"PRØV IGEN":"GEOMETRY DASH",180,190);dc.font="15px system-ui";dc.fillText(dashState==="won"?"100% gennemført":dashState==="over"?"Klik for at starte forfra":"Hold knappen nede i ship og wave",180,227)}
 }
 function dashLoop(t){if(dashScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden")){dashRaf=0;return}
  if(!dashLast)dashLast=t;const dt=Math.min((t-dashLast)/16.667,2);dashLast=t;
  if(dashState==="playing"){
- dashFrame+=dt;dashV+=.6*dt;dashY+=dashV*dt;
- if(dashY>=0){dashY=0;dashV=0;dashAngle=Math.round(dashAngle/(Math.PI/2))*(Math.PI/2)}
- else dashAngle+=.11*dt;
- const worldX=dashFrame*dashSpeed;
+ const prevX=dashFrame*dashSpeed;dashFrame+=dt;const worldX=dashFrame*dashSpeed;
+ for(const [pos,mode] of dashPortals){if(prevX<pos&&worldX>=pos){dashMode=mode;dashV=0;dashAngle=0;dashTrail=[];if(mode!=="cube")dashY=-150;else dashY=0}}
+ if(dashMode==="cube"){dashV+=.6*dt;dashY+=dashV*dt;if(dashY>=0){dashY=0;dashV=0;dashAngle=Math.round(dashAngle/(Math.PI/2))*(Math.PI/2)}else dashAngle+=.11*dt}
+ else if(dashMode==="ship"){dashV+=(dashHolding?-.36:.28)*dt;dashV=Math.max(-5,Math.min(5,dashV));dashY+=dashV*dt;dashAngle=Math.max(-.45,Math.min(.45,dashV*.09))}
+ else{dashY+=(dashHolding?-4.2:4.2)*dt;dashAngle=dashHolding?-.65:.65;dashTrail.push({x:worldX,y:dashGround-16+dashY});if(dashTrail.length>35)dashTrail.shift()}
  dashProgress=Math.min(100,Math.floor(worldX/dashFinish*100));
- for(const [pos,type] of dashLayout){const x=pos-worldX+83;if(x>112||x < 40)continue;
- const left=67,right=99,bottom=dashGround+dashY,top=bottom-32;
- if(type==="spike"){if(right>x+7&&left<x+27&&bottom>dashGround-23)dashState="over"}
- else if(right>x+4&&left<x+36&&bottom>dashGround-38&&top<dashGround)dashState="over";
- if(dashState==="over")break}
+ const bottom=dashGround+dashY,top=bottom-32;
+ if(dashMode!=="cube"&&(top<45||bottom>dashGround-4))dashState="over";
+ if(dashMode==="cube")for(const [pos,type] of dashLayout){const x=pos-worldX+83;if(x>112||x<40)continue;if(type==="spike"){if(99>x+7&&67<x+27&&bottom>dashGround-23)dashState="over"}else if(99>x+4&&67<x+36&&bottom>dashGround-38&&top<dashGround)dashState="over";if(dashState==="over")break}
+ if(dashMode!=="cube")for(const [pos,y] of dashAirHazards){const x=pos-worldX+83;if(Math.abs(x-83)<27&&Math.abs((dashGround-16+dashY)-y)<28)dashState="over"}
  if(worldX>=dashFinish){dashState="won";dashProgress=100}
  if(dashProgress>dashBest){dashBest=dashProgress;try{localStorage.setItem("skoleboard-geometry-best-v1",String(dashBest))}catch{}}
  }
@@ -155,8 +158,8 @@ function dashLoop(t){if(dashScreen.classList.contains("hidden")||gamesModal.clas
 function startDashLoop(){if(!dashRaf)dashRaf=requestAnimationFrame(dashLoop)}
 el("playDash").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.remove("hidden");resetDash();startDashLoop()};
 el("backFromDash").onclick=()=>{dashScreen.classList.add("hidden");gameMenu.classList.remove("hidden");dashState="ready"};
-dashCanvas.addEventListener("pointerdown",dashJump);
-document.addEventListener("keydown",e=>{if(e.code==="Space"&&!dashScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();dashJump()}});
+dashCanvas.addEventListener("pointerdown",e=>{dashCanvas.setPointerCapture(e.pointerId);dashJump()});dashCanvas.addEventListener("pointerup",dashRelease);dashCanvas.addEventListener("pointercancel",dashRelease);
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&!dashScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();if(!e.repeat)dashJump()}});document.addEventListener("keyup",e=>{if(e.code==="Space")dashRelease()});
 
 gamesModal.addEventListener("click",e=>{if(e.target===gamesModal){gamesModal.classList.add("hidden");gameState="ready"}});
 </script>
