@@ -31,7 +31,7 @@
   <div class="gamesHeader"><h2>🎮 Spil</h2><button id="closeGames" class="ghost" type="button" aria-label="Luk spil">✕</button></div>
   <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button><button id="playDash" class="primary" type="button" style="margin-top:12px;background:#198eac">🟩 Geometry Dash – Spil nu</button></div>
   <div id="flappyScreen" class="hidden"><canvas id="flappyCanvas" width="360" height="440" aria-label="Flappy Bird spil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på spillet for at flyve. Tryk igen for at starte forfra.</p><button id="backToGames" class="ghost" type="button">← Tilbage til spil</button></div>
-  <div id="dashScreen" class="hidden"><canvas id="dashCanvas" width="360" height="440" aria-label="Geometry Dash spil"></canvas><p class="gameHint">Cube: tryk for at hoppe. Ship: hold for at flyve op. Wave: hold for at flyve skråt op, slip for at flyve ned.</p><button id="backFromDash" class="ghost" type="button">← Tilbage til spil</button></div>
+  <div id="dashScreen" class="hidden"><canvas id="dashCanvas" width="360" height="440" aria-label="Geometry Dash spil"></canvas><p class="gameHint">Cube: hold mellemrum eller museknappen nede for at hoppe automatisk. Ship: hold for at flyve op. Wave: hold for at flyve skråt op, slip for at flyve ned.</p><button id="backFromDash" class="ghost" type="button">← Tilbage til spil</button></div>
  </div>
 </div>
 <script>
@@ -143,7 +143,7 @@ function dashLoop(t){if(dashScreen.classList.contains("hidden")||gamesModal.clas
  if(dashState==="playing"){
  const prevX=dashFrame*dashSpeed;dashFrame+=dt;const worldX=dashFrame*dashSpeed;
  for(const [pos,mode] of dashPortals){if(prevX<pos&&worldX>=pos){dashMode=mode;dashV=0;dashAngle=0;dashTrail=[];if(mode!=="cube")dashY=-150;else dashY=0}}
- if(dashMode==="cube"){dashV+=.6*dt;dashY+=dashV*dt;if(dashY>=0){dashY=0;dashV=0;dashAngle=Math.round(dashAngle/(Math.PI/2))*(Math.PI/2)}else dashAngle+=.11*dt}
+ if(dashMode==="cube"){dashV+=.6*dt;dashY+=dashV*dt;if(dashY>=0){dashY=0;dashV=0;dashAngle=Math.round(dashAngle/(Math.PI/2))*(Math.PI/2);if(dashHolding)dashV=-11.8}else dashAngle+=.11*dt}
  else if(dashMode==="ship"){dashV+=(dashHolding?-.36:.28)*dt;dashV=Math.max(-5,Math.min(5,dashV));dashY+=dashV*dt;dashAngle=Math.max(-.45,Math.min(.45,dashV*.09))}
  else{dashY+=(dashHolding?-4.2:4.2)*dt;dashAngle=dashHolding?-.65:.65;dashTrail.push({x:worldX,y:dashGround-16+dashY});if(dashTrail.length>35)dashTrail.shift()}
  dashProgress=Math.min(100,Math.floor(worldX/dashFinish*100));
