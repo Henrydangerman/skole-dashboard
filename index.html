@@ -29,7 +29,7 @@
 <div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
  <div class="gamesWindow">
   <div class="gamesHeader"><h2>🎮 Spil</h2><button id="closeGames" class="ghost" type="button" aria-label="Luk spil">✕</button></div>
-  <div id="gameMenu"><button id="playFlappy" class="primary" type="button"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Flappy_Bird_logo.png" alt="" class="flappyLogo" loading="lazy"> <span>Flappy Bird – Spil nu</span></button></div>
+  <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button></div>
   <div id="flappyScreen" class="hidden"><canvas id="flappyCanvas" width="360" height="440" aria-label="Flappy Bird spil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på spillet for at flyve. Tryk igen for at starte forfra.</p><button id="backToGames" class="ghost" type="button">← Tilbage til spil</button></div>
  </div>
 </div>
@@ -60,17 +60,24 @@ function drawFlappy(){
  ctx.fillStyle="#e4f6ff";for(let i=0;i<4;i++){let x=(i*125+40-frame*.3)%480;if(x< -60)x+=480;ctx.beginPath();ctx.ellipse(x,75+i%2*45,35,13,0,0,Math.PI*2);ctx.fill()}
  for(const p of pipes){ctx.fillStyle="#32a951";ctx.fillRect(p.x,0,55,p.gap-76);ctx.fillRect(p.x,p.gap+76,55,440-p.gap-76);ctx.fillStyle="#23883d";ctx.fillRect(p.x-4,p.gap-94,63,18);ctx.fillRect(p.x-4,p.gap+76,63,18)}
  // Fuglens næb og vinger følger dens bevægelse
- const tilt=gameState==="playing"?Math.max(-.75,Math.min(1.25,velocity*.15)):(gameState==="over"?1.05:0);
- const wingPhase=gameState==="playing"?Math.sin(frame*.65):Math.sin(performance.now()/230)*.35;
+ const tilt=gameState==="playing"?Math.max(-.6,Math.min(1.1,velocity*.13)):(gameState==="over"?1:0);
+ const wingPhase=gameState==="playing"?Math.sin(frame*.55):Math.sin(performance.now()/260)*.35;
  ctx.save();ctx.translate(83,birdY);ctx.rotate(tilt);
- ctx.fillStyle="#ffd73d";ctx.beginPath();ctx.ellipse(0,0,16,14,0,0,Math.PI*2);ctx.fill();
- // Vingen bevæger sig tydeligt op og ned
- ctx.save();ctx.translate(-7,2);ctx.rotate(-.55-wingPhase*.8);
- ctx.fillStyle="#f0a929";ctx.beginPath();ctx.ellipse(-2,2,11,6,-.15,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle="#cf861a";ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
- ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(7,-5,6,0,Math.PI*2);ctx.fill();
- ctx.fillStyle="#152a43";ctx.beginPath();ctx.arc(9,-5,2.5,0,Math.PI*2);ctx.fill();
- ctx.fillStyle="#ff8d27";ctx.beginPath();ctx.moveTo(14,1);ctx.lineTo(29,5);ctx.lineTo(14,10);ctx.closePath();ctx.fill();
+ // Retro-pixel-fugl med tydelige sorte konturer
+ ctx.lineJoin="round";ctx.lineWidth=2.8;ctx.strokeStyle="#3d3031";
+ ctx.fillStyle="#ffe14b";ctx.beginPath();ctx.ellipse(0,0,17,13,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ // Hale
+ ctx.fillStyle="#f5a93b";ctx.fillRect(-19,-1,6,8);ctx.strokeRect(-19,-1,6,8);
+ // Animeret vinge
+ ctx.save();ctx.translate(-7,4);ctx.rotate(-.25-wingPhase*.65);
+ ctx.fillStyle="#fff6d2";ctx.beginPath();ctx.ellipse(0,0,10,6,-.2,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ctx.restore();
+ // Stort hvidt øje
+ ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(8,-6,7,8,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ctx.fillStyle="#242a38";ctx.fillRect(10,-7,3,4);
+ // Orange næb med to lag
+ ctx.fillStyle="#ffb22b";ctx.fillRect(12,1,17,6);ctx.strokeRect(12,1,17,6);
+ ctx.fillStyle="#f2762b";ctx.fillRect(14,7,12,4);ctx.strokeRect(14,7,12,4);
  ctx.restore();
  ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 29px system-ui";ctx.fillText(String(score),180,43);
  ctx.textAlign="right";ctx.fillStyle="#0b3561";ctx.font="bold 16px system-ui";ctx.fillText("🏆 Rekord: "+bestScore,346,27);
