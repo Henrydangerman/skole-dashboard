@@ -96,7 +96,19 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 #schedule .lunch-row .lesson-box input{font-size:12px;line-height:15px}
 #schedule .now-lesson{padding:12px;margin:10px 0}
 #schedule .now-title{font-size:clamp(19px,2.4vw,25px)}
-#schedule td.current-slot{background:#e6b82e!important;outline:3px solid #ffd94d!important;outline-offset:-3px}#schedule td.current-slot .lesson-box{background:#ffe17a!important;border-color:#bd8e13!important}#schedule td.current-slot .lesson-box input{color:#382900!important}#dunkCanvas{display:block;margin:10px auto;max-width:100%;border-radius:12px;touch-action:none;background:#a7e9ff}</style>
+#schedule td.current-slot{background:#e6b82e!important;outline:3px solid #ffd94d!important;outline-offset:-3px}#schedule td.current-slot .lesson-box{background:#ffe17a!important;border-color:#bd8e13!important}#schedule td.current-slot .lesson-box input{color:#382900!important}#dunkCanvas{display:block;margin:10px auto;max-width:100%;border-radius:12px;touch-action:none;background:#a7e9ff}
+#controlToggle{position:fixed;left:18px;bottom:20px;z-index:25;box-shadow:0 8px 25px #0008}
+#controlPanel{position:fixed;inset:0;z-index:45;background:#020a18d9;display:flex;align-items:center;justify-content:center;padding:15px}
+#controlPanel.hidden{display:none}
+.control-window{background:var(--panel);border:1px solid var(--accent);border-radius:20px;padding:22px;width:min(100%,510px);max-height:90vh;overflow-y:auto;box-shadow:0 20px 65px #0009}
+.control-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.control-head h2{margin:0}.control-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:17px 0}
+.control-actions button{padding:12px 8px}.control-visibility{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.control-visibility label{display:flex;gap:9px;align-items:center;font-weight:500;background:#061a35aa;padding:10px;border-radius:9px}
+.control-visibility input{width:auto;margin:0;accent-color:var(--accent)}
+.control-note{font-size:12px;color:#b4cce5;line-height:1.5}
+@media(max-width:450px){.control-actions,.control-visibility{grid-template-columns:1fr}}
+</style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
 <body>
@@ -113,6 +125,8 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 
 </main>
 
+<button id="controlToggle" type="button" class="primary">⚙️ Kontrolpanel</button>
+<div id="controlPanel" class="hidden" role="dialog" aria-modal="true" aria-label="Rediger SkoleBoard"><div class="control-window"><div class="control-head"><h2>⚙️ Kontrolpanel</h2><button id="closeControl" class="ghost" type="button">✕</button></div><p class="control-note">Tilpas SkoleBoard direkte, uden ChatGPT.</p><div class="control-actions"><button id="controlAddLink" class="primary" type="button">＋ Tilføj link</button><button id="controlEditSchedule" class="ghost" type="button">📅 Rediger skema</button><button id="controlTheme" class="ghost" type="button">🎨 Farver og baggrund</button><button id="controlReorder" class="ghost" type="button">↕️ Flyt bokse</button></div><h3>Vis eller skjul bokse</h3><div id="controlVisibility" class="control-visibility"></div><p class="control-note">Dine ændringer gemmes i denne browser. De ændrer ikke hjemmesiden for andre eller på dine andre enheder.</p></div></div>
 <button id="fullscreenToggle" type="button" class="ghost" title="Fuldskærm" aria-label="Slå fuldskærm til eller fra">⛶ Fuldskærm</button>
 <button id="gamesToggle" type="button" aria-label="Åbn spil">🎮 Spil</button>
 <div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
@@ -409,5 +423,47 @@ dashCanvas.addEventListener("pointerdown",e=>{dashCanvas.setPointerCapture(e.poi
 document.addEventListener("keydown",e=>{if(e.code==="Space"&&!dashScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();if(!e.repeat)dashJump()}});document.addEventListener("keyup",e=>{if(e.code==="Space")dashRelease()});
 
 gamesModal.addEventListener("click",e=>{if(e.target===gamesModal){gamesModal.classList.add("hidden");gameState="ready"}});
+
+const controlPanel=el("controlPanel"),controlToggle=el("controlToggle");
+const controlWidgetNames={links:"🔗 Links",search:"🔎 Google-søgning",holiday:"🏖️ Ferie",theme:"🎨 Tema",schedule:"📅 Skoleskema"};
+const controlVisibilityKey="skoleboard-hidden-widgets-v1";
+let hiddenWidgets=[];try{const stored=JSON.parse(localStorage.getItem(controlVisibilityKey)||"[]");if(Array.isArray(stored))hiddenWidgets=stored.filter(x=>Object.hasOwn(controlWidgetNames,x))}catch{}
+function applyWidgetVisibility(){
+ document.querySelectorAll("[data-widget]").forEach(node=>{
+  const key=node.dataset.widget;
+  if(Object.hasOwn(controlWidgetNames,key))node.style.display=hiddenWidgets.includes(key)?"none":"";
+ });
+}
+function renderControlVisibility(){
+ el("controlVisibility").replaceChildren();
+ for(const [key,name] of Object.entries(controlWidgetNames)){
+  const label=document.createElement("label"),input=document.createElement("input");
+  input.type="checkbox";input.checked=!hiddenWidgets.includes(key);
+  input.addEventListener("change",()=>{
+   hiddenWidgets=hiddenWidgets.filter(x=>x!==key);
+   if(!input.checked)hiddenWidgets.push(key);
+   localStorage.setItem(controlVisibilityKey,JSON.stringify(hiddenWidgets));
+   applyWidgetVisibility();
+  });
+  label.append(input,document.createTextNode(name));el("controlVisibility").append(label);
+ }
+}
+function openControl(){renderControlVisibility();controlPanel.classList.remove("hidden")}
+function closeControl(){controlPanel.classList.add("hidden")}
+function showControlWidget(key){
+ hiddenWidgets=hiddenWidgets.filter(x=>x!==key);
+ localStorage.setItem(controlVisibilityKey,JSON.stringify(hiddenWidgets));applyWidgetVisibility();
+ closeControl();const widget=document.querySelector('[data-widget="'+key+'"]');
+ if(widget)widget.scrollIntoView({behavior:"smooth",block:"center"});
+ return widget;
+}
+controlToggle.onclick=openControl;el("closeControl").onclick=closeControl;
+controlPanel.addEventListener("click",e=>{if(e.target===controlPanel)closeControl()});
+el("controlAddLink").onclick=()=>{closeControl();el("addBtn").click();el("editor").scrollIntoView({behavior:"smooth",block:"center"})};
+el("controlEditSchedule").onclick=()=>{showControlWidget("schedule");const field=el("scheduleTable").querySelector("input");if(field)field.focus({preventScroll:true})};
+el("controlTheme").onclick=()=>showControlWidget("theme");
+el("controlReorder").onclick=()=>{showControlWidget("links");const handle=document.querySelector(".widget-handle");if(handle)handle.scrollIntoView({behavior:"smooth",block:"center"})};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!controlPanel.classList.contains("hidden"))closeControl()});
+applyWidgetVisibility();
 </script>
 </body></html>
