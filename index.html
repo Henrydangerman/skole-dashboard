@@ -32,6 +32,25 @@ body[data-theme="dark"]{--accent:#353f57;--panel:#1c2638;--card:#222e42}
 .schedule-table input{width:100%;margin:0;padding:10px 5px;background:transparent;border:1px solid transparent;text-align:center;font-size:13px}
 .schedule-table input:focus{border-color:#69b2ff;outline:0}
 #snakeCanvas{display:block;margin:10px auto;max-width:100%;background:#0b203b;border-radius:12px;touch-action:none}
+
+#schedule{background:#e9eff4;color:#174364;border-color:#b8cbd9}
+#schedule .muted{color:#456982}
+#schedule .ghost{background:#d3e4ef;color:#184e70}
+#schedule .schedule-table{border-collapse:separate;border-spacing:3px;min-width:900px}
+#schedule .schedule-table th{background:#e3ebf0;color:#155077;padding:13px 8px;text-transform:uppercase;font-size:13px}
+#schedule .schedule-table th.today{background:#194361;color:#fff}
+#schedule .schedule-table th small{display:block;margin:10px auto 0;background:#d5e0e7;color:#155077;border-radius:50%;width:38px;height:38px;line-height:38px;font-weight:400}
+#schedule .schedule-table td{vertical-align:top;background:#f4f6f8;padding:2px}
+#schedule .schedule-table td.today{background:#e3eef5}
+#schedule .schedule-table td.lesson-index{background:#e9eff4;color:#456982;text-align:center;vertical-align:middle;font-size:12px;width:42px}
+#schedule .lesson-splits{display:flex;gap:3px;min-height:43px}
+#schedule .lesson-box{flex:1;min-width:0;border:1px solid #c9d9e3;border-radius:4px;background:white;padding:2px 4px}
+#schedule .lesson-box input{display:block;width:100%;padding:0 2px;margin:0;background:transparent;color:#003b65;border:0;border-radius:0;text-align:left;font-size:13px;line-height:18px}
+#schedule .lesson-box input:first-child{font-weight:700}
+#schedule .lesson-box input:focus{background:#e4f3ff;outline:1px solid #4b9de0}
+#schedule .lunch-row .lesson-box{background:#f0f6fa}
+#schedule .lunch-row .lesson-box input{font-size:12px;line-height:14px}
+#schedule .lunch-row .lesson-box input:nth-child(2){display:none}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
@@ -45,7 +64,7 @@ body[data-theme="dark"]{--accent:#353f57;--panel:#1c2638;--card:#222e42}
  <div class="panel"><h3>🏖️ Nedtælling til ferie</h3><label for="holidayDate">Vælg feriens startdato</label><input id="holidayDate" type="date"><p id="holidayCountdown" class="muted">Vælg en dato for at starte nedtællingen.</p></div>
  <div class="panel"><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><select id="themeChoice"><option value="blue">Blå</option><option value="purple">Lilla</option><option value="green">Grøn</option><option value="dark">Mørk</option></select><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
 </section>
-<section class="panel" id="schedule"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2><button id="clearSchedule" class="ghost" type="button">Ryd skema</button></div><p class="muted">Skriv fag direkte i felterne. De gemmes automatisk på denne enhed.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section>
+<section class="panel" id="schedule"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2><button id="clearSchedule" class="ghost" type="button">Ryd skema</button></div><p class="muted">Skemaet er indsat fra dit billede. Du kan rette fag og lærere direkte i felterne.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section>
 
 </main>
 
@@ -75,10 +94,31 @@ el("form").onsubmit=e=>{e.preventDefault();const name=el("name").value.trim();le
 render();
 
 
-const scheduleKey="skoleboard-schedule-v1",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
-let scheduleData={};try{scheduleData=JSON.parse(localStorage.getItem(scheduleKey)||"{}")||{}}catch{}
-function renderSchedule(){const today=new Date().getDay()-1;let h="<thead><tr><th>Time</th>"+scheduleDays.map(d=>"<th>"+d+"</th>").join("")+"</tr></thead><tbody>";for(let row=0;row<8;row++){h+="<tr><td>"+(row+1)+". time</td>";for(let day=0;day<5;day++){const k=day+"-"+row;h+='<td class="'+(day===today?"today":"")+'"><input maxlength="45" data-slot="'+k+'" aria-label="'+scheduleDays[day]+" "+(row+1)+'. time" value="'+esc(scheduleData[k]||"")+'" placeholder="Fag"></td>'}h+="</tr>"}el("scheduleTable").innerHTML=h+"</tbody>";el("scheduleTable").querySelectorAll("[data-slot]").forEach(inp=>inp.addEventListener("input",()=>{scheduleData[inp.dataset.slot]=inp.value;try{localStorage.setItem(scheduleKey,JSON.stringify(scheduleData))}catch{}}))}
-renderSchedule();el("clearSchedule").onclick=()=>{if(confirm("Vil du rydde hele skoleskemaet?")){scheduleData={};localStorage.removeItem(scheduleKey);renderSchedule()}};
+
+const scheduleKey="skoleboard-schedule-image-v1",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
+const scheduleTemplate=[
+ [["SAM|U2, HT"],["DAN|U2, MK"],["ENG|U2, RW"],["TYS|U2, BC"],["DAN|U2, MK"]],
+ [["SAM|U2, HT"],["DAN|U2, MK"],["ENG|U2, RW"],["TYS|U2, BC"],["DAN|U2, MK"]],
+ [["IDR|U2, SI"],["F/K|U2, MUA","Hold|U2, SI"],["HDSv|U2, SI","Hold|U2, IE","MADv|U2, MK"],["HIS|U2, HT"],["MAT|U2, SI"]],
+ [["IDR|U2, SI"],["F/K|U2, MUA","Hold|U2, SI"],["HDSv|U2, SI","Hold|U2, IE","MADv|U2, MK"],["Hold|U2, MK","MAT|U2, SI"],["Hold|U2, RW","MAT|U2, SI"]],
+ [["SPISE|U2, SI"],["SPISE|U2, MUA"],["SPISE|U2, SI","SPISE|U2, MK"],["SPISE|U2, SI"],["SPISE|U2, SI"]],
+ [["BIO|U2, HH"],["MAT|U2, SI"],["DAN|U2, MK"],["Hold|U2, MK","MAT|U2, SI"],["TYS|U2, BC"]],
+ [["ENG|U2, RW"],["HIS|U2, HT"],["DAN|U2, MK"],["LVF|U2, RW"],["KRI|U2, HT"]],
+ [[],["GEO|U2, HH"],["DAN|U2, MK"],["LVF|U2, RW"],[]]
+];
+let scheduleData={};try{const saved=JSON.parse(localStorage.getItem(scheduleKey)||"{}");if(saved&&typeof saved==="object")scheduleData=saved}catch{}
+function renderSchedule(){
+ const today=new Date().getDay()-1;
+ let h="<thead><tr><th></th>"+scheduleDays.map((d,i)=>'<th class="'+(i===today?"today":"")+'">'+d+'<small>AJN</small></th>').join("")+"</tr></thead><tbody>";
+ for(let row=0;row<8;row++){h+='<tr class="'+(row===4?"lunch-row":"")+'"><td class="lesson-index">'+(row===4?"Pause":row<4?row+1:row)+'.</td>';
+ for(let day=0;day<5;day++){const slots=scheduleTemplate[row][day];h+='<td class="'+(day===today?"today":"")+'"><div class="lesson-splits">';
+ for(let n=0;n<slots.length;n++){const key=day+"-"+row+"-"+n,parts=(scheduleData[key]??slots[n]).split("|");h+='<div class="lesson-box"><input data-key="'+key+'" data-part="0" aria-label="'+scheduleDays[day]+' fag" value="'+esc(parts[0]||"")+'"><input data-key="'+key+'" data-part="1" aria-label="'+scheduleDays[day]+' lokale og lærer" value="'+esc(parts.slice(1).join("|")||"")+'"></div>'}
+ h+="</div></td>"}h+="</tr>"}
+ el("scheduleTable").innerHTML=h+"</tbody>";
+ el("scheduleTable").querySelectorAll("input[data-key]").forEach(input=>input.addEventListener("input",()=>{const key=input.dataset.key,parts=(scheduleData[key]??scheduleTemplate[Number(key.split("-")[1])][Number(key.split("-")[0])][Number(key.split("-")[2])]).split("|");parts[Number(input.dataset.part)]=input.value;scheduleData[key]=parts.join("|");try{localStorage.setItem(scheduleKey,JSON.stringify(scheduleData))}catch{}}))
+}
+renderSchedule();el("clearSchedule").textContent="Gendan originalt skema";
+el("clearSchedule").onclick=()=>{if(confirm("Vil du gendanne skemaet fra billedet? Dine egne ændringer bliver slettet.")){scheduleData={};localStorage.removeItem(scheduleKey);renderSchedule()}};
 const holidayDate=el("holidayDate");holidayDate.value=localStorage.getItem("skoleboard-holiday")||"";holidayDate.onchange=()=>{localStorage.setItem("skoleboard-holiday",holidayDate.value);updateHoliday()};
 function updateHoliday(){if(!holidayDate.value){el("holidayCountdown").textContent="Vælg en dato for at starte nedtællingen.";return}const target=new Date(holidayDate.value+"T00:00:00"),diff=target-new Date();if(diff<=0){el("holidayCountdown").textContent="🎉 Ferien er startet!";return}const days=Math.floor(diff/86400000),hours=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000);el("holidayCountdown").textContent=days+" dage, "+hours+" timer og "+mins+" minutter tilbage!"}updateHoliday();setInterval(updateHoliday,30000);
 const themeChoice=el("themeChoice");themeChoice.value=localStorage.getItem("skoleboard-theme")||"blue";document.body.dataset.theme=themeChoice.value;themeChoice.onchange=()=>{document.body.dataset.theme=themeChoice.value;localStorage.setItem("skoleboard-theme",themeChoice.value)};
