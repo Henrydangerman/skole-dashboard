@@ -61,7 +61,7 @@ body[data-theme="dark"]{--accent:#353f57;--panel:#1c2638;--card:#222e42}
 <section id="cards" class="grid"></section>
 <form id="searchForm" role="search" action="https://www.google.com/search" method="get" target="_blank"><input name="q" aria-label="Søg på Google" placeholder="🔎 Søg på Google..." required><button class="primary" type="submit">Søg</button></form>
 <section class="extra-tools">
- <div class="panel"><h3>🏖️ Nedtælling til ferie</h3><label for="holidayDate">Vælg feriens startdato (juleferie foreslået)</label><input id="holidayDate" type="date"><p id="holidayCountdown" class="muted">Vælg en dato for at starte nedtællingen.</p></div>
+ <div class="panel"><h3>🏖️ Nedtælling til ferie</h3><p id="holidayName" style="font-weight:700;margin:8px 0"></p><p id="holidayCountdown" class="muted" aria-live="off">Nedtællingen indlæses...</p><details><summary style="cursor:pointer;color:#a9c1dd">Se alle kommende ferier</summary><div id="holidayList" class="muted" style="font-size:13px;line-height:1.8;margin-top:8px"></div></details></div>
  <div class="panel"><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><select id="themeChoice"><option value="blue">Blå</option><option value="purple">Lilla</option><option value="green">Grøn</option><option value="dark">Mørk</option></select><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
 </section>
 <section class="panel" id="schedule"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2><button id="clearSchedule" class="ghost" type="button">Ryd skema</button></div><p class="muted">Skemaet er indsat fra dit billede. Du kan rette fag og lærere direkte i felterne.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section>
@@ -119,8 +119,26 @@ function renderSchedule(){
 }
 renderSchedule();el("clearSchedule").textContent="Gendan originalt skema";
 el("clearSchedule").onclick=()=>{if(confirm("Vil du gendanne skemaet fra billedet? Dine egne ændringer bliver slettet.")){scheduleData={};localStorage.removeItem(scheduleKey);renderSchedule()}};
-const holidayDate=el("holidayDate");holidayDate.value=localStorage.getItem("skoleboard-holiday")||"2026-12-19";holidayDate.onchange=()=>{localStorage.setItem("skoleboard-holiday",holidayDate.value);updateHoliday()};
-function updateHoliday(){if(!holidayDate.value){el("holidayCountdown").textContent="Vælg en dato for at starte nedtællingen.";return}const target=new Date(holidayDate.value+"T00:00:00"),diff=target-new Date();if(diff<=0){el("holidayCountdown").textContent="🎉 Ferien er startet!";return}const days=Math.floor(diff/86400000),hours=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000);el("holidayCountdown").textContent=days+" dage, "+hours+" timer og "+mins+" minutter tilbage!"}updateHoliday();setInterval(updateHoliday,30000);
+const schoolHolidays=[
+ {name:"🎄 Juleferie",start:"2026-12-19",end:"2027-01-04"},
+ {name:"❄️ Vinterferie (uge 8)",start:"2027-02-20",end:"2027-02-28"},
+ {name:"🐣 Påskeferie",start:"2027-03-20",end:"2027-03-29"},
+ {name:"🌤️ Kristi himmelfartsferie",start:"2027-05-06",end:"2027-05-07"},
+ {name:"🌸 Pinseferie",start:"2027-05-15",end:"2027-05-17"},
+ {name:"☀️ Sommerferie",start:"2027-06-26",end:null}
+];
+function updateHoliday(){
+ const now=new Date(),dateOnly=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+ const holiday=schoolHolidays.find(h=>new Date((h.end||h.start)+"T23:59:59")>=dateOnly)||null;
+ const list=el("holidayList");list.innerHTML=schoolHolidays.map(h=>'<div>'+h.name.replace(/</g,"&lt;")+': '+new Date(h.start+"T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"long",year:"numeric"})+'</div>').join("");
+ if(!holiday){el("holidayName").textContent="Ingen flere feriedatoer registreret";el("holidayCountdown").textContent="Tilføj nye datoer for skoleåret 2027/28.";return}
+ el("holidayName").textContent=holiday.name;
+ const start=new Date(holiday.start+"T00:00:00"),end=holiday.end?new Date(holiday.end+"T23:59:59"):null;
+ if(now>=start&&(end===null||now<=end)){el("holidayCountdown").textContent="🎉 Ferien er i gang!";return}
+ const diff=start-now,days=Math.floor(diff/86400000),hours=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000);
+ el("holidayCountdown").textContent=days+" dage, "+hours+" timer og "+mins+" minutter tilbage!";
+}
+updateHoliday();setInterval(updateHoliday,30000);
 const themeChoice=el("themeChoice");themeChoice.value=localStorage.getItem("skoleboard-theme")||"blue";document.body.dataset.theme=themeChoice.value;themeChoice.onchange=()=>{document.body.dataset.theme=themeChoice.value;localStorage.setItem("skoleboard-theme",themeChoice.value)};
 function applyBg(bg){if(bg)document.body.style.setProperty("--custom-bg",'url("'+bg+'")');else document.body.style.removeProperty("--custom-bg")}
 try{applyBg(localStorage.getItem("skoleboard-background"))}catch{}
