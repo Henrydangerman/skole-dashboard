@@ -21,6 +21,21 @@ body{background-image:linear-gradient(#07152ccc,#07152ccc),var(--custom-bg,radia
 body[data-theme="purple"]{--accent:#8747df;--panel:#2c2050;--card:#32265d}
 body[data-theme="green"]{--accent:#168d79;--panel:#123d40;--card:#16494a}
 body[data-theme="dark"]{--accent:#353f57;--panel:#1c2638;--card:#222e42}
+body[data-theme="pink"]{--accent:#d34b96;--panel:#482342;--card:#56294c;--tint:#f59bd2}
+body[data-theme="red"]{--accent:#d84b55;--panel:#49232d;--card:#5a2935;--tint:#ffadb4}
+body[data-theme="orange"]{--accent:#e17c31;--panel:#493322;--card:#59402b;--tint:#ffd1a1}
+body[data-theme="cyan"]{--accent:#009fb5;--panel:#103c50;--card:#16485e;--tint:#8df0ff}
+body[data-theme="midnight"]{--accent:#465cbd;--panel:#121a36;--card:#1a2447;--tint:#a9baff}
+body[data-theme="forest"]{--accent:#3c9860;--panel:#182f2b;--card:#214139;--tint:#b0e7b7}
+body[data-theme="sunset"]{--accent:#e46682;--panel:#442840;--card:#57324b;--tint:#ffd2b5}
+body[data-theme="gold"]{--accent:#bb8b26;--panel:#383222;--card:#49412b;--tint:#f6da86}
+body[data-theme="pink"],body[data-theme="red"],body[data-theme="orange"],body[data-theme="cyan"],body[data-theme="midnight"],body[data-theme="forest"],body[data-theme="sunset"],body[data-theme="gold"]{background-color:var(--panel)}
+body[data-theme] .linkcard:hover{border-color:var(--accent)}
+body[data-theme] #gamesToggle{background:var(--accent)}
+body[data-theme] #clock{color:var(--tint,#75b9ff)}
+body[data-theme] .panel{border-color:color-mix(in srgb,var(--accent) 42%,#315779)}
+body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315779)}
+
 .primary{background:var(--accent)}.panel{background:var(--panel)}.linkcard{background:var(--card)}
 .extra-tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
 .extra-tools .panel{margin:0}.extra-tools h3{margin:0 0 10px}.extra-tools input,.extra-tools select{margin:5px 0 10px}
@@ -62,7 +77,7 @@ body[data-theme="dark"]{--accent:#353f57;--panel:#1c2638;--card:#222e42}
 <form id="searchForm" role="search" action="https://www.google.com/search" method="get" target="_blank"><input name="q" aria-label="Søg på Google" placeholder="🔎 Søg på Google..." required><button class="primary" type="submit">Søg</button></form>
 <section class="extra-tools">
  <div class="panel"><h3>🏖️ Nedtælling til ferie</h3><p id="holidayName" style="font-weight:700;margin:8px 0"></p><p id="holidayCountdown" class="muted" aria-live="off" style="font-size:clamp(24px,3vw,36px);font-weight:800;line-height:1.25;margin:16px 0;color:#eaf5ff">Nedtællingen indlæses...</p><details><summary style="cursor:pointer;color:#a9c1dd">Se alle kommende ferier</summary><div id="holidayList" class="muted" style="font-size:13px;line-height:1.8;margin-top:8px"></div></details></div>
- <div class="panel"><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><select id="themeChoice"><option value="blue">Blå</option><option value="purple">Lilla</option><option value="green">Grøn</option><option value="dark">Mørk</option></select><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
+ <div class="panel"><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><select id="themeChoice"><option value="blue">Blå</option><option value="purple">Lilla</option><option value="green">Grøn</option><option value="dark">Mørk</option><option value="pink">🌸 Lyserød</option><option value="red">❤️ Rød</option><option value="orange">🍊 Orange</option><option value="cyan">🩵 Turkis</option><option value="midnight">🌌 Midnatsblå</option><option value="forest">🌲 Skovgrøn</option><option value="sunset">🌅 Solnedgang</option><option value="gold">✨ Guld</option></select><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
 </section>
 <section class="panel" id="schedule"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2><button id="clearSchedule" class="ghost" type="button">Ryd skema</button></div><p class="muted">Skemaet er indsat fra dit billede. Du kan rette fag og lærere direkte i felterne.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section>
 
