@@ -148,8 +148,22 @@ function renderSchedule(){
  el("scheduleTable").innerHTML=h+"</tbody>";
  el("scheduleTable").querySelectorAll("input[data-key]").forEach(input=>input.addEventListener("input",()=>{const key=input.dataset.key,parts=(scheduleData[key]??scheduleTemplate[Number(key.split("-")[1])][Number(key.split("-")[0])][Number(key.split("-")[2])]).split("|");parts[Number(input.dataset.part)]=input.value;scheduleData[key]=parts.join("|");try{localStorage.setItem(scheduleKey,JSON.stringify(scheduleData))}catch{}}))
 }
+
+const timeKey="skoleboard-lesson-times-v1";
+let lessonTimes=[];try{const saved=JSON.parse(localStorage.getItem(timeKey)||"[]");if(Array.isArray(saved))lessonTimes=saved}catch{}
+function renderLessonTimes(){let html="";for(let i=0;i<8;i++){const t=lessonTimes[i]||{};html+='<div class="time-row"><span>'+(i===4?"Spisepause":(i<4?i+1:i)+". time")+'</span><input type="time" data-lesson="'+i+'" data-field="start" value="'+esc(t.start||"")+'" aria-label="Start for time '+(i+1)+'"><span>til</span><input type="time" data-lesson="'+i+'" data-field="end" value="'+esc(t.end||"")+'" aria-label="Slut for time '+(i+1)+'"></div>'}el("lessonTimes").innerHTML=html;el("lessonTimes").querySelectorAll("input").forEach(input=>input.onchange=()=>{const i=Number(input.dataset.lesson);lessonTimes[i]||={};lessonTimes[i][input.dataset.field]=input.value;localStorage.setItem(timeKey,JSON.stringify(lessonTimes));updateCurrentLesson()})}
+function lessonText(day,row){const slots=scheduleTemplate[row]?.[day]||[];const labels=slots.map((v,n)=>{const key=day+"-"+row+"-"+n;return (scheduleData[key]??v).split("|")[0]}).filter(Boolean);return [...new Set(labels)].join(" / ")||"Ingen fag"}
+function updateCurrentLesson(){const now=new Date(),day=now.getDay()-1,minutes=now.getHours()*60+now.getMinutes();const current=el("currentLesson"),next=el("nextLesson");if(day<0||day>4){current.textContent="Weekend 🎉";next.textContent="Ingen skoledag i dag";return}
+const configured=lessonTimes.some(t=>t&&t.start&&t.end);if(!configured){current.textContent="Indstil dine ringetider";next.textContent="Tryk på ⚙️ Indstil ringetider for at se dit fag lige nu";return}
+let active=-1,upcoming=-1;for(let i=0;i<8;i++){const t=lessonTimes[i];if(!t?.start||!t?.end)continue;const start=Number(t.start.slice(0,2))*60+Number(t.start.slice(3,5)),end=Number(t.end.slice(0,2))*60+Number(t.end.slice(3,5));if(minutes>=start&&minutes<end){active=i;break}if(start>minutes&&upcoming<0)upcoming=i}
+if(active>=0){current.textContent=lessonText(day,active);next.textContent=(active===4?"Spisepause":(active<4?active+1:active)+". time")+" · "+lessonTimes[active].start+"–"+lessonTimes[active].end}
+else if(upcoming>=0){current.textContent="Pause / ingen time lige nu";next.textContent="Næste: "+lessonText(day,upcoming)+" kl. "+lessonTimes[upcoming].start}
+else{current.textContent="Ingen time lige nu";next.textContent="Skemaet er slut for i dag, eller ringetider mangler"}
+el("scheduleTable").querySelectorAll(".current-slot").forEach(td=>td.classList.remove("current-slot"));if(active>=0){const cell=el("scheduleTable").querySelector('[data-day="'+day+'"][data-row="'+active+'"]');if(cell)cell.classList.add("current-slot")}
+}
+renderLessonTimes();updateCurrentLesson();setInterval(updateCurrentLesson,15000);
 renderSchedule();el("clearSchedule").textContent="Gendan originalt skema";
-el("clearSchedule").onclick=()=>{if(confirm("Vil du gendanne skemaet fra billedet? Dine egne ændringer bliver slettet.")){scheduleData={};localStorage.removeItem(scheduleKey);renderSchedule()}};
+el("clearSchedule").onclick=()=>{if(confirm("Vil du gendanne skemaet fra billedet? Dine egne ændringer bliver slettet.")){scheduleData={};localStorage.removeItem(scheduleKey);renderSchedule();updateCurrentLesson()}};
 const schoolHolidays=[
  {name:"🎄 Juleferie",start:"2026-12-19",end:"2027-01-04"},
  {name:"❄️ Vinterferie (uge 8)",start:"2027-02-20",end:"2027-02-28"},
