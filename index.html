@@ -96,7 +96,7 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 #schedule .lunch-row .lesson-box input{font-size:12px;line-height:15px}
 #schedule .now-lesson{padding:12px;margin:10px 0}
 #schedule .now-title{font-size:clamp(19px,2.4vw,25px)}
-#schedule td.current-slot{background:#e6b82e!important;outline:3px solid #ffd94d!important;outline-offset:-3px}#schedule td.current-slot .lesson-box{background:#ffe17a!important;border-color:#bd8e13!important}#schedule td.current-slot .lesson-box input{color:#382900!important}</style>
+#schedule td.current-slot{background:#e6b82e!important;outline:3px solid #ffd94d!important;outline-offset:-3px}#schedule td.current-slot .lesson-box{background:#ffe17a!important;border-color:#bd8e13!important}#schedule td.current-slot .lesson-box input{color:#382900!important}#dunkCanvas{display:block;margin:10px auto;max-width:100%;border-radius:12px;touch-action:none;background:#a7e9ff}</style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
 <body>
@@ -118,9 +118,10 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 <div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
  <div class="gamesWindow">
   <div class="gamesHeader"><h2>🎮 Spil</h2><button id="closeGames" class="ghost" type="button" aria-label="Luk spil">✕</button></div>
-  <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button><button id="playDash" class="primary" type="button" style="margin-top:12px;background:#198eac">🟩 Geometry Dash – Spil nu</button><button id="playSnake" class="primary" type="button" style="margin-top:12px;background:#169b70">🐍 Snake – Spil nu</button></div>
+  <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button><button id="playDash" class="primary" type="button" style="margin-top:12px;background:#198eac">🟩 Geometry Dash – Spil nu</button><button id="playDunk" class="primary" type="button" style="margin-top:12px;background:#db8135">🏀 Flappy Dunk – Spil nu</button><button id="playSnake" class="primary" type="button" style="margin-top:12px;background:#169b70">🐍 Snake – Spil nu</button></div>
   <div id="flappyScreen" class="hidden"><canvas id="flappyCanvas" width="360" height="440" aria-label="Flappy Bird spil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på spillet for at flyve. Tryk igen for at starte forfra.</p><button id="backToGames" class="ghost" type="button">← Tilbage til spil</button></div>
   <div id="dashScreen" class="hidden"><canvas id="dashCanvas" width="360" height="440" aria-label="Geometry Dash spil"></canvas><p class="gameHint">Cube: hold mellemrum eller museknappen nede for at hoppe automatisk. Ship: hold for at flyve op. Wave: hold for at flyve skråt op, slip for at flyve ned.</p><button id="backFromDash" class="ghost" type="button">← Tilbage til spil</button></div>
+  <div id="dunkScreen" class="hidden"><canvas id="dunkCanvas" width="360" height="440" aria-label="Flappy Dunk basketballspil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på skærmen for at flyve. Ram gennem kurvene ovenfra!</p><button id="dunkRestart" class="primary" type="button">Start forfra</button> <button id="dunkBack" class="ghost" type="button">← Tilbage til spil</button></div>
   <div id="snakeScreen" class="hidden"><canvas id="snakeCanvas" width="320" height="320" aria-label="Snake spil"></canvas><p class="gameHint">Brug piletasterne eller WASD. På mobil: swipe for at styre.</p><p id="snakeRecord" class="gameHint">🏆 Rekord: 0</p><button id="snakeRestart" class="primary" type="button">Start forfra</button> <button id="snakeBack" class="ghost" type="button">← Tilbage til spil</button></div>
  </div>
 </div>
@@ -228,7 +229,7 @@ function snakeTick(){if(snakeOver)return;snakeDir=snakeNext;const head=[snake[0]
 function snakeStart(){snakeReset();clearInterval(snakeTimer);snakeTimer=setInterval(()=>{if(!snakeScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden"))snakeTick()},130)}
 function snakeStop(){clearInterval(snakeTimer);snakeTimer=null}
 function snakeDirection(x,y){if(x!==-snakeDir[0]||y!==-snakeDir[1])snakeNext=[x,y]}
-el("playSnake").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.remove("hidden");snakeStart()};
+el("playSnake").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.remove("hidden");dunkScreen.classList.add("hidden");snakeStart()};
 el("snakeBack").onclick=()=>{snakeStop();snakeScreen.classList.add("hidden");gameMenu.classList.remove("hidden")};
 el("snakeRestart").onclick=snakeStart;
 document.addEventListener("keydown",e=>{if(snakeScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;const k=e.key.toLowerCase(),dirs={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};if(dirs[k]){e.preventDefault();snakeDirection(...dirs[k])}});
@@ -253,6 +254,47 @@ function addWidgetControls(){for(const w of widgetArea.querySelectorAll(":scope 
  w.addEventListener("drop",e=>{e.preventDefault();w.classList.remove("drop-target");const source=[...widgetArea.children].find(x=>x.dataset.widget===e.dataTransfer.getData("text/plain"));if(!source||source===w)return;const rect=w.getBoundingClientRect();widgetArea.insertBefore(source,e.clientY<rect.top+rect.height/2?w:w.nextSibling);saveWidgetOrder()});
 }}
 addWidgetControls();
+
+
+const dunkScreen=el("dunkScreen"),dunkCanvas=el("dunkCanvas"),dctx=dunkCanvas.getContext("2d");
+let dunkY=205,dunkVy=0,dunkHoops=[],dunkScore=0,dunkBest=0,dunkState="ready",dunkFrame=0,dunkLast=0,dunkRaf=0,dunkNextX=255,dunkPointer=false;
+try{dunkBest=Number(localStorage.getItem("skoleboard-dunk-best-v1"))||0}catch{}
+function dunkReset(){dunkY=205;dunkVy=0;dunkHoops=[{x:260,y:265,passed:false,missed:false}];dunkNextX=260;dunkScore=0;dunkFrame=0;dunkState="ready";dunkLast=0;dunkDraw()}
+function dunkFlap(){if(dunkScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;if(dunkState==="over")dunkReset();dunkState="playing";dunkVy=-5.3}
+function dunkDraw(){
+ const g=dctx;g.clearRect(0,0,360,440);const grad=g.createLinearGradient(0,0,0,440);grad.addColorStop(0,"#a7e9ff");grad.addColorStop(1,"#e9f9ff");g.fillStyle=grad;g.fillRect(0,0,360,440);
+ g.fillStyle="#ffffff77";for(let i=0;i<5;i++){let x=(i*115+35-dunkFrame*.3)%480;if(x< -50)x+=480;g.beginPath();g.ellipse(x,60+(i%3)*60,33,12,0,0,Math.PI*2);g.fill()}
+ for(const h of dunkHoops){const x=h.x,y=h.y;
+  g.strokeStyle="#b3c4d1";g.lineWidth=3;g.beginPath();g.moveTo(x+43,y-45);g.lineTo(x+43,y+12);g.stroke();
+  g.fillStyle="#ffffffd9";g.fillRect(x+35,y-47,17,28);g.strokeStyle="#8ba4b8";g.lineWidth=2;g.strokeRect(x+35,y-47,17,28);
+  g.strokeStyle="#ffffff";g.lineWidth=2;for(let j=0;j<5;j++){g.beginPath();g.moveTo(x-30+j*15,y+2);g.lineTo(x-21+j*11,y+26);g.stroke()}g.beginPath();g.moveTo(x-30,y+2);g.lineTo(x-19,y+26);g.lineTo(x+19,y+26);g.lineTo(x+30,y+2);g.stroke();
+  g.strokeStyle="#f36b24";g.lineWidth=7;g.lineCap="round";g.beginPath();g.moveTo(x-32,y);g.lineTo(x+32,y);g.stroke();
+  g.strokeStyle="#ffb36b";g.lineWidth=2;g.beginPath();g.moveTo(x-31,y-2);g.lineTo(x+31,y-2);g.stroke();
+ }
+ g.save();g.translate(83,dunkY);g.rotate(Math.max(-.45,Math.min(.7,dunkVy*.075)));g.fillStyle="#e97c23";g.strokeStyle="#65350e";g.lineWidth=2.5;g.beginPath();g.arc(0,0,15,0,Math.PI*2);g.fill();g.stroke();g.beginPath();g.moveTo(-15,0);g.lineTo(15,0);g.moveTo(0,-15);g.lineTo(0,15);g.moveTo(-11,-10);g.quadraticCurveTo(5,0,-11,10);g.moveTo(11,-10);g.quadraticCurveTo(-5,0,11,10);g.stroke();g.restore();
+ g.fillStyle="#154a76";g.textAlign="center";g.font="bold 29px system-ui";g.fillText(String(dunkScore),180,42);g.textAlign="right";g.font="bold 14px system-ui";g.fillText("🏆 "+dunkBest,347,27);
+ if(dunkState!=="playing"){g.fillStyle="#082340bf";g.fillRect(35,155,290,112);g.fillStyle="#fff";g.textAlign="center";g.font="bold 25px system-ui";g.fillText(dunkState==="over"?"Game over!":"🏀 Flappy Dunk",180,197);g.font="15px system-ui";g.fillText(dunkState==="over"?"Tryk for at prøve igen":"Tryk for at hoppe gennem kurvene",180,228)}
+}
+function dunkLoop(t){dunkRaf=requestAnimationFrame(dunkLoop);if(dunkScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden")){dunkLast=t;return}const dt=Math.min(2.2,(t-(dunkLast||t))/16.67||1);dunkLast=t;
+ if(dunkState==="playing"){dunkFrame+=dt;const prevY=dunkY;dunkVy+=.32*dt;dunkY+=dunkVy*dt;
+ const speed=(2.05+Math.min(1.5,dunkScore*.08))*dt;
+ for(const h of dunkHoops){const prevX=h.x;h.x-=speed;
+ // Count only a clean downward pass through the opening of the hoop.
+ if(!h.passed&&dunkVy>0&&prevY+15<=h.y&&dunkY+15>=h.y&&Math.abs(h.x-83)<24){h.passed=true;dunkScore++;if(dunkScore>dunkBest){dunkBest=dunkScore;try{localStorage.setItem("skoleboard-dunk-best-v1",String(dunkBest))}catch{}}}
+ if(!h.passed&&h.x+34<65)dunkState="over";
+ // Hitting the rim without scoring ends the run.
+ if(!h.passed&&Math.abs(h.x-83)<45&&Math.abs(dunkY-h.y)<14&&Math.abs(h.x-83)>24)dunkState="over";
+ }
+ if(dunkHoops.length&&dunkHoops[dunkHoops.length-1].x<185){const last=dunkHoops[dunkHoops.length-1];dunkHoops.push({x:last.x+225,y:145+Math.random()*175,passed:false})}
+ dunkHoops=dunkHoops.filter(h=>h.x> -75);if(dunkY<15||dunkY>425)dunkState="over";
+ }
+ dunkDraw()}
+function dunkStart(){dunkReset();if(!dunkRaf)dunkRaf=requestAnimationFrame(dunkLoop)}
+el("playDunk").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.add("hidden");dunkScreen.classList.remove("hidden");snakeStop();dunkStart()};
+el("dunkBack").onclick=()=>{dunkScreen.classList.add("hidden");gameMenu.classList.remove("hidden");dunkState="ready"};
+el("dunkRestart").onclick=dunkStart;
+dunkCanvas.addEventListener("pointerdown",e=>{e.preventDefault();dunkFlap()});
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&!dunkScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();if(!e.repeat)dunkFlap()}});
 
 const gamesModal=el("gamesModal"),gameMenu=el("gameMenu"),flappyScreen=el("flappyScreen");
 const canvas=el("flappyCanvas"),ctx=canvas.getContext("2d");
@@ -298,9 +340,9 @@ function gameLoop(t){if(gamesModal.classList.contains("hidden")||flappyScreen.cl
  pipes=pipes.filter(p=>p.x>-65);if(birdY<15||birdY>425)gameState="over"}
  drawFlappy();raf=requestAnimationFrame(gameLoop)}
 function startLoop(){if(!raf)raf=requestAnimationFrame(gameLoop)}
-el("gamesToggle").onclick=()=>{gamesModal.classList.remove("hidden");gameMenu.classList.remove("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.add("hidden");snakeStop()};
+el("gamesToggle").onclick=()=>{gamesModal.classList.remove("hidden");gameMenu.classList.remove("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.add("hidden");dunkScreen.classList.add("hidden");snakeStop()};
 el("closeGames").onclick=()=>{gamesModal.classList.add("hidden");gameState="ready";snakeStop()};
-el("playFlappy").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.remove("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.add("hidden");snakeStop();resetFlappy();startLoop()};
+el("playFlappy").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.remove("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.add("hidden");dunkScreen.classList.add("hidden");snakeStop();resetFlappy();startLoop()};
 el("backToGames").onclick=()=>{flappyScreen.classList.add("hidden");gameMenu.classList.remove("hidden");gameState="ready"};
 canvas.addEventListener("pointerdown",flap);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!gamesModal.classList.contains("hidden")){gamesModal.classList.add("hidden");gameState="ready"}if(e.code==="Space"&&!flappyScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();flap()}});
@@ -361,7 +403,7 @@ function dashLoop(t){if(dashScreen.classList.contains("hidden")||gamesModal.clas
  }
  drawDash();dashRaf=requestAnimationFrame(dashLoop)}
 function startDashLoop(){if(!dashRaf)dashRaf=requestAnimationFrame(dashLoop)}
-el("playDash").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.remove("hidden");snakeScreen.classList.add("hidden");snakeStop();resetDash();startDashLoop()};
+el("playDash").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.remove("hidden");snakeScreen.classList.add("hidden");dunkScreen.classList.add("hidden");snakeStop();resetDash();startDashLoop()};
 el("backFromDash").onclick=()=>{dashScreen.classList.add("hidden");gameMenu.classList.remove("hidden");dashState="ready"};
 dashCanvas.addEventListener("pointerdown",e=>{dashCanvas.setPointerCapture(e.pointerId);dashJump()});dashCanvas.addEventListener("pointerup",dashRelease);dashCanvas.addEventListener("pointercancel",dashRelease);
 document.addEventListener("keydown",e=>{if(e.code==="Space"&&!dashScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden")){e.preventDefault();if(!e.repeat)dashJump()}});document.addEventListener("keyup",e=>{if(e.code==="Space")dashRelease()});
