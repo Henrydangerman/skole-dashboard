@@ -82,20 +82,20 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 #linkCards.grid{margin-top:0}
 @media(max-width:650px){#fullscreenToggle{right:116px;padding:13px 10px;font-size:12px}}
 .bg-color-row{display:flex;gap:12px;align-items:center;margin:6px 0 18px}.bg-color-row input[type="color"]{width:85px;height:48px;padding:4px;margin:0;cursor:pointer;border-radius:10px}.bg-color-row button{height:44px}.theme-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:9px;margin:10px 0 22px}.theme-option{display:flex;align-items:center;gap:9px;background:#102b4b;border:1px solid #41688e;border-radius:12px;padding:10px;color:#e9f4ff;cursor:pointer;text-align:left;font-size:13px}.theme-option:hover{border-color:#85caff;background:#20496f}.theme-option[aria-pressed="true"]{outline:2px solid #80ceff;background:#24527c;font-weight:700}.theme-swatch{width:21px;height:21px;flex:none;border-radius:7px;border:1px solid #ffffff66}.bg-presets{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.bg-preset{width:36px;height:36px;border:2px solid #8baac5;border-radius:10px;cursor:pointer}.bg-preset:hover{outline:2px solid #8cceff}.now-lesson{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;background:#133a5d;border:1px solid #3c7199;border-radius:14px;padding:17px;margin:14px 0}.now-eyebrow{font-size:13px;color:#9fd3ff;font-weight:700}.now-title{font-size:clamp(22px,3vw,30px);font-weight:800;margin:5px 0}.now-sub{font-size:13px;color:#bdd9ef}.lesson-settings{max-width:100%;font-size:13px}.lesson-settings summary{cursor:pointer;color:#b5dcff;padding:7px}.lesson-settings[open]{width:min(100%,420px)}.lesson-times{display:grid;gap:6px;margin-top:12px}.time-row{display:flex;gap:6px;align-items:center;justify-content:space-between}.time-row span:first-child{min-width:70px}.time-row input{width:110px;max-width:30%;padding:7px;margin:0;font-size:13px}#schedule td.current-slot{outline:3px solid #76f0b4;outline-offset:-3px;background:#285e69}#schedule td.current-slot .lesson-box{border-color:#76f0b4}#schedule .schedule-table{min-width:690px;border-spacing:2px}#schedule .schedule-table th{padding:6px 3px;font-size:11px}#schedule .schedule-table th small{margin:4px auto 0;width:24px;height:24px;line-height:24px;font-size:10px}#schedule .schedule-table td{padding:1px}#schedule .schedule-table td.lesson-index{font-size:10px;width:30px}#schedule .lesson-splits{gap:2px;min-height:32px}#schedule .lesson-box{padding:1px 2px;border-radius:3px}#schedule .lesson-box input{font-size:11px;line-height:14px;padding:0 1px}#schedule .lunch-row .lesson-box input{font-size:10px;line-height:13px}#schedule .now-lesson{padding:12px;margin:10px 0}#schedule .now-title{font-size:clamp(19px,2.4vw,25px)}#schedule .schedule-scroll{margin-top:8px}
-/* Compact timetable: keep lesson fields editable while using less space. */
-#schedule{padding:13px 15px;max-width:900px}
-#schedule .schedule-scroll{max-width:860px;margin-top:6px}
-#schedule .schedule-table{min-width:560px;width:100%;border-spacing:1px}
-#schedule .schedule-table th{padding:4px 2px;font-size:10px}
-#schedule .schedule-table th small{width:19px;height:19px;line-height:19px;margin:3px auto 0;font-size:9px}
-#schedule .schedule-table td{padding:0}
-#schedule .schedule-table td.lesson-index{width:25px;font-size:9px}
-#schedule .lesson-splits{gap:1px;min-height:25px}
-#schedule .lesson-box{padding:1px;border-radius:2px}
-#schedule .lesson-box input{font-size:10px;line-height:12px;padding:0 1px}
-#schedule .lunch-row .lesson-box input{font-size:9px;line-height:12px}
-#schedule .now-lesson{padding:9px;margin:8px 0}
-#schedule .now-title{font-size:20px}
+/* Keep the timetable card compact without shrinking lesson boxes or their text. */
+#schedule{padding:16px;max-width:850px;width:100%}
+#schedule .schedule-scroll{max-width:100%;margin-top:8px;overflow-x:auto}
+#schedule .schedule-table{min-width:760px;width:100%;border-spacing:3px}
+#schedule .schedule-table th{padding:9px 5px;font-size:12px}
+#schedule .schedule-table th small{width:30px;height:30px;line-height:30px;margin:6px auto 0;font-size:11px}
+#schedule .schedule-table td{padding:2px}
+#schedule .schedule-table td.lesson-index{width:36px;font-size:11px}
+#schedule .lesson-splits{gap:3px;min-height:43px}
+#schedule .lesson-box{padding:3px 4px;border-radius:4px}
+#schedule .lesson-box input{font-size:13px;line-height:18px;padding:0 2px}
+#schedule .lunch-row .lesson-box input{font-size:12px;line-height:15px}
+#schedule .now-lesson{padding:12px;margin:10px 0}
+#schedule .now-title{font-size:clamp(19px,2.4vw,25px)}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
