@@ -66,6 +66,21 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 #schedule .lunch-row .lesson-box{background:#193f61}
 #schedule .lunch-row .lesson-box input{font-size:12px;line-height:14px}
 #schedule .lunch-row .lesson-box input:nth-child(2){display:none}
+
+#fullscreenToggle{position:fixed;right:132px;bottom:22px;z-index:20;padding:15px 18px;border:1px solid #5284b7;box-shadow:0 12px 35px #0007}
+.widget-area{display:flex;flex-direction:column;gap:18px;margin-top:20px}
+.widget-area>.grid{margin-top:0}
+.widget-area .extra-tools{margin-top:0}
+.widget-area>.panel{margin-top:0}
+.widget-handle{font-size:12px;color:#a9c1dd;cursor:grab;user-select:none;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;touch-action:none}
+.widget-handle:active{cursor:grabbing}
+.widget-move{display:flex;gap:4px}
+.widget-move button{border:1px solid #47749c;border-radius:6px;background:#17395d;color:#d8ebff;padding:3px 8px;cursor:pointer}
+.widget.dragging{opacity:.45}
+.widget.drop-target{outline:2px dashed #73caff;outline-offset:4px}
+#cards.widget{display:block}
+#linkCards.grid{margin-top:0}
+@media(max-width:650px){#fullscreenToggle{right:116px;padding:13px 10px;font-size:12px}}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
@@ -73,16 +88,17 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 <main>
 <div class="top"><div><p class="muted" id="date"></p><p id="clock" role="timer" aria-label="Klokken"></p></div><button class="primary" id="addBtn">＋ Tilføj website</button></div>
 <section id="editor" class="panel hidden"><h3 id="formTitle">Tilføj website</h3><form id="form"><label for="name">Navn</label><input id="name" maxlength="80" placeholder="Fx Aula" required><label for="url">Link til hjemmesiden</label><input id="url" type="url" placeholder="https://..." required><div><button class="primary" type="submit">Gem website</button> <button class="ghost" id="cancel" type="button">Annuller</button></div></form></section>
-<section id="cards" class="grid"></section>
-<form id="searchForm" role="search" action="https://www.google.com/search" method="get" target="_blank"><input name="q" aria-label="Søg på Google" placeholder="🔎 Søg på Google..." required><button class="primary" type="submit">Søg</button></form>
-<section class="extra-tools">
- <div class="panel"><h3>🏖️ Nedtælling til ferie</h3><p id="holidayName" style="font-weight:700;margin:8px 0"></p><p id="holidayCountdown" class="muted" aria-live="off" style="font-size:clamp(24px,3vw,36px);font-weight:800;line-height:1.25;margin:16px 0;color:#eaf5ff">Nedtællingen indlæses...</p><details><summary style="cursor:pointer;color:#a9c1dd">Se alle kommende ferier</summary><div id="holidayList" class="muted" style="font-size:13px;line-height:1.8;margin-top:8px"></div></details></div>
- <div class="panel"><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><select id="themeChoice"><option value="blue">Blå</option><option value="purple">Lilla</option><option value="green">Grøn</option><option value="dark">Mørk</option><option value="pink">🌸 Lyserød</option><option value="red">❤️ Rød</option><option value="orange">🍊 Orange</option><option value="cyan">🩵 Turkis</option><option value="midnight">🌌 Midnatsblå</option><option value="forest">🌲 Skovgrøn</option><option value="sunset">🌅 Solnedgang</option><option value="gold">✨ Guld</option></select><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
-</section>
-<section class="panel" id="schedule"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2><button id="clearSchedule" class="ghost" type="button">Ryd skema</button></div><p class="muted">Skemaet er indsat fra dit billede. Du kan rette fag og lærere direkte i felterne.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section>
+<div id="widgetArea" class="widget-area"><section id="cards" class="grid widget" data-widget="links"><div class="widget-handle" aria-label="Flyt links">⠿ Links <span class="widget-move"></span></div><div id="linkCards" class="grid"></div></section>
+<div class="widget" data-widget="search"><div class="widget-handle">⠿ Google-søgning <span class="widget-move"></span></div><form id="searchForm" role="search" action="https://www.google.com/search" method="get" target="_blank"><input name="q" aria-label="Søg på Google" placeholder="🔎 Søg på Google..." required><button class="primary" type="submit">Søg</button></form></div>
+<div class="extra-tools" id="toolsWidgets">
+ <div class="panel widget" data-widget="holiday"><div class="widget-handle">⠿ Flyt nedtælling <span class="widget-move"></span></div><h3>🏖️ Nedtælling til ferie</h3><p id="holidayName" style="font-weight:700;margin:8px 0"></p><p id="holidayCountdown" class="muted" aria-live="off" style="font-size:clamp(24px,3vw,36px);font-weight:800;line-height:1.25;margin:16px 0;color:#eaf5ff">Nedtællingen indlæses...</p><details><summary style="cursor:pointer;color:#a9c1dd">Se alle kommende ferier</summary><div id="holidayList" class="muted" style="font-size:13px;line-height:1.8;margin-top:8px"></div></details></div>
+ <div class="panel widget" data-widget="theme"><div class="widget-handle">⠿ Flyt temaer <span class="widget-move"></span></div><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><select id="themeChoice"><option value="blue">Blå</option><option value="purple">Lilla</option><option value="green">Grøn</option><option value="dark">Mørk</option><option value="pink">🌸 Lyserød</option><option value="red">❤️ Rød</option><option value="orange">🍊 Orange</option><option value="cyan">🩵 Turkis</option><option value="midnight">🌌 Midnatsblå</option><option value="forest">🌲 Skovgrøn</option><option value="sunset">🌅 Solnedgang</option><option value="gold">✨ Guld</option></select><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
+</div>
+<section class="panel widget" data-widget="schedule"><div class="widget-handle">⠿ Flyt skoleskema <span class="widget-move"></span></div><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2><button id="clearSchedule" class="ghost" type="button">Ryd skema</button></div><p class="muted">Skemaet er indsat fra dit billede. Du kan rette fag og lærere direkte i felterne.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section></div>
 
 </main>
 
+<button id="fullscreenToggle" type="button" class="ghost" title="Fuldskærm" aria-label="Slå fuldskærm til eller fra">⛶ Fuldskærm</button>
 <button id="gamesToggle" type="button" aria-label="Åbn spil">🎮 Spil</button>
 <div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
  <div class="gamesWindow">
@@ -90,7 +106,7 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
   <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button><button id="playDash" class="primary" type="button" style="margin-top:12px;background:#198eac">🟩 Geometry Dash – Spil nu</button><button id="playSnake" class="primary" type="button" style="margin-top:12px;background:#169b70">🐍 Snake – Spil nu</button></div>
   <div id="flappyScreen" class="hidden"><canvas id="flappyCanvas" width="360" height="440" aria-label="Flappy Bird spil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på spillet for at flyve. Tryk igen for at starte forfra.</p><button id="backToGames" class="ghost" type="button">← Tilbage til spil</button></div>
   <div id="dashScreen" class="hidden"><canvas id="dashCanvas" width="360" height="440" aria-label="Geometry Dash spil"></canvas><p class="gameHint">Cube: hold mellemrum eller museknappen nede for at hoppe automatisk. Ship: hold for at flyve op. Wave: hold for at flyve skråt op, slip for at flyve ned.</p><button id="backFromDash" class="ghost" type="button">← Tilbage til spil</button></div>
-  <div id="snakeScreen" class="hidden"><canvas id="snakeCanvas" width="320" height="320" aria-label="Snake spil"></canvas><p class="gameHint">Brug piletasterne eller WASD. På mobil: swipe for at styre.</p><button id="snakeRestart" class="primary" type="button">Start forfra</button> <button id="snakeBack" class="ghost" type="button">← Tilbage til spil</button></div>
+  <div id="snakeScreen" class="hidden"><canvas id="snakeCanvas" width="320" height="320" aria-label="Snake spil"></canvas><p class="gameHint">Brug piletasterne eller WASD. På mobil: swipe for at styre.</p><p id="snakeRecord" class="gameHint">🏆 Rekord: 0</p><button id="snakeRestart" class="primary" type="button">Start forfra</button> <button id="snakeBack" class="ghost" type="button">← Tilbage til spil</button></div>
  </div>
 </div>
 <script>
@@ -101,7 +117,7 @@ const valid=u=>{try{const p=new URL(u);return ["https:","http:"].includes(p.prot
 const save=()=>localStorage.setItem(storageKey,JSON.stringify(links));
 el("date").textContent=new Date().toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 function updateClock(){el("clock").textContent=new Date().toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit",second:"2-digit"});}updateClock();setInterval(updateClock,1000);
-function render(){el("cards").innerHTML=links.length?links.map(x=>{const url=valid(x.url)?x.url:"#";let host="Website";try{host=new URL(url).hostname}catch{}return '<article class="linkcard"><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer"><span class="symbol"><img src="'+(x.name.toLowerCase()==="meebook"?"https://logo.clearbit.com/meebook.com?size=128":"https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=64")+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'↗\'"></span><span><strong>'+esc(x.name)+'</strong><small>'+esc(host)+'</small></span></a><div class="actions"><button class="ghost" data-edit="'+esc(x.id)+'">Rediger</button><button class="danger" data-delete="'+esc(x.id)+'">Slet</button></div></article>'}).join(""):'<div class="panel empty" style="grid-column:1/-1">Du har ingen websites endnu. Tryk på “Tilføj website” for at komme i gang.</div>';document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEditor(b.dataset.edit));document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{if(confirm("Vil du slette dette website?")){links=links.filter(x=>x.id!==b.dataset.delete);save();render()}})}
+function render(){el("linkCards").innerHTML=links.length?links.map(x=>{const url=valid(x.url)?x.url:"#";let host="Website";try{host=new URL(url).hostname}catch{}return '<article class="linkcard"><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer"><span class="symbol"><img src="'+(x.name.toLowerCase()==="meebook"?"https://logo.clearbit.com/meebook.com?size=128":"https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=64")+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'↗\'"></span><span><strong>'+esc(x.name)+'</strong><small>'+esc(host)+'</small></span></a><div class="actions"><button class="ghost" data-edit="'+esc(x.id)+'">Rediger</button><button class="danger" data-delete="'+esc(x.id)+'">Slet</button></div></article>'}).join(""):'<div class="panel empty" style="grid-column:1/-1">Du har ingen websites endnu. Tryk på “Tilføj website” for at komme i gang.</div>';document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEditor(b.dataset.edit));document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{if(confirm("Vil du slette dette website?")){links=links.filter(x=>x.id!==b.dataset.delete);save();render()}})}
 function openEditor(id=null){editing=id;const x=links.find(x=>x.id===id);el("formTitle").textContent=x?"Rediger website":"Tilføj website";el("name").value=x?.name||"";el("url").value=x?.url||"";el("editor").classList.remove("hidden");el("name").focus()}
 function closeEditor(){editing=null;el("editor").classList.add("hidden");el("form").reset()}
 el("addBtn").onclick=()=>openEditor();el("cancel").onclick=closeEditor;
@@ -160,11 +176,12 @@ try{applyBg(localStorage.getItem("skoleboard-background"))}catch{}
 el("bgUpload").onchange=e=>{const file=e.target.files[0];if(!file)return;if(!file.type.startsWith("image/")){alert("Vælg et billede.");return}if(file.size>3*1024*1024){alert("Vælg et billede under 3 MB.");return}const reader=new FileReader();reader.onload=()=>{try{localStorage.setItem("skoleboard-background",reader.result);applyBg(reader.result)}catch{alert("Billedet fylder for meget til browserens lager. Prøv et mindre billede.")}};reader.readAsDataURL(file)};
 el("removeBg").onclick=()=>{localStorage.removeItem("skoleboard-background");applyBg(null);el("bgUpload").value=""};
 const snakeScreen=el("snakeScreen"),snakeCanvas=el("snakeCanvas"),sc=snakeCanvas.getContext("2d");
+let snakeBest=0;try{snakeBest=Math.max(0,Number(localStorage.getItem("skoleboard-snake-best-v1"))||0)}catch{};
 let snake=[],snakeDir=[1,0],snakeNext=[1,0],snakeFood=[12,12],snakeScore=0,snakeTimer=null,snakeOver=false;
 function snakeNewFood(){let p;do{p=[Math.floor(Math.random()*16),Math.floor(Math.random()*16)]}while(snake.some(s=>s[0]===p[0]&&s[1]===p[1]));return p}
 function snakeReset(){snake=[[5,8],[4,8],[3,8]];snakeDir=[1,0];snakeNext=[1,0];snakeFood=snakeNewFood();snakeScore=0;snakeOver=false;snakeDraw()}
-function snakeDraw(){sc.fillStyle="#0b203b";sc.fillRect(0,0,320,320);sc.strokeStyle="#1a3757";for(let i=0;i<=16;i++){sc.beginPath();sc.moveTo(i*20,0);sc.lineTo(i*20,320);sc.moveTo(0,i*20);sc.lineTo(320,i*20);sc.stroke()}sc.fillStyle="#ff6a87";sc.fillRect(snakeFood[0]*20+3,snakeFood[1]*20+3,14,14);snake.forEach((p,i)=>{sc.fillStyle=i?"#41c99c":"#91ffe0";sc.fillRect(p[0]*20+2,p[1]*20+2,16,16)});sc.fillStyle="#fff";sc.font="bold 16px system-ui";sc.fillText("Point: "+snakeScore,9,22);if(snakeOver){sc.fillStyle="#06162cdd";sc.fillRect(35,120,250,75);sc.fillStyle="#fff";sc.font="bold 24px system-ui";sc.textAlign="center";sc.fillText("Game over!",160,165);sc.textAlign="left"}}
-function snakeTick(){if(snakeOver)return;snakeDir=snakeNext;const head=[snake[0][0]+snakeDir[0],snake[0][1]+snakeDir[1]],eating=head[0]===snakeFood[0]&&head[1]===snakeFood[1];if(head[0]<0||head[0]>=16||head[1]<0||head[1]>=16||snake.slice(0,eating?undefined:-1).some(p=>p[0]===head[0]&&p[1]===head[1])){snakeOver=true;snakeDraw();return}snake.unshift(head);if(eating){snakeScore++;snakeFood=snakeNewFood()}else snake.pop();snakeDraw()}
+function snakeDraw(){el("snakeRecord").textContent="🏆 Rekord: "+snakeBest;sc.fillStyle="#0b203b";sc.fillRect(0,0,320,320);sc.strokeStyle="#1a3757";for(let i=0;i<=16;i++){sc.beginPath();sc.moveTo(i*20,0);sc.lineTo(i*20,320);sc.moveTo(0,i*20);sc.lineTo(320,i*20);sc.stroke()}sc.fillStyle="#ff6a87";sc.fillRect(snakeFood[0]*20+3,snakeFood[1]*20+3,14,14);snake.forEach((p,i)=>{sc.fillStyle=i?"#41c99c":"#91ffe0";sc.fillRect(p[0]*20+2,p[1]*20+2,16,16)});sc.fillStyle="#fff";sc.font="bold 16px system-ui";sc.fillText("Point: "+snakeScore,9,22);sc.textAlign="right";sc.fillText("🏆 "+snakeBest,310,22);sc.textAlign="left";if(snakeOver){sc.fillStyle="#06162cdd";sc.fillRect(35,120,250,75);sc.fillStyle="#fff";sc.font="bold 24px system-ui";sc.textAlign="center";sc.fillText("Game over!",160,165);sc.textAlign="left"}}
+function snakeTick(){if(snakeOver)return;snakeDir=snakeNext;const head=[snake[0][0]+snakeDir[0],snake[0][1]+snakeDir[1]],eating=head[0]===snakeFood[0]&&head[1]===snakeFood[1];if(head[0]<0||head[0]>=16||head[1]<0||head[1]>=16||snake.slice(0,eating?undefined:-1).some(p=>p[0]===head[0]&&p[1]===head[1])){snakeOver=true;snakeDraw();return}snake.unshift(head);if(eating){snakeScore++;if(snakeScore>snakeBest){snakeBest=snakeScore;try{localStorage.setItem("skoleboard-snake-best-v1",String(snakeBest))}catch{}}snakeFood=snakeNewFood()}else snake.pop();snakeDraw()}
 function snakeStart(){snakeReset();clearInterval(snakeTimer);snakeTimer=setInterval(()=>{if(!snakeScreen.classList.contains("hidden")&&!gamesModal.classList.contains("hidden"))snakeTick()},130)}
 function snakeStop(){clearInterval(snakeTimer);snakeTimer=null}
 function snakeDirection(x,y){if(x!==-snakeDir[0]||y!==-snakeDir[1])snakeNext=[x,y]}
@@ -173,6 +190,26 @@ el("snakeBack").onclick=()=>{snakeStop();snakeScreen.classList.add("hidden");gam
 el("snakeRestart").onclick=snakeStart;
 document.addEventListener("keydown",e=>{if(snakeScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;const k=e.key.toLowerCase(),dirs={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};if(dirs[k]){e.preventDefault();snakeDirection(...dirs[k])}});
 let snakeTouch=null;snakeCanvas.addEventListener("touchstart",e=>{snakeTouch=[e.touches[0].clientX,e.touches[0].clientY]},{passive:true});snakeCanvas.addEventListener("touchend",e=>{if(!snakeTouch)return;const dx=e.changedTouches[0].clientX-snakeTouch[0],dy=e.changedTouches[0].clientY-snakeTouch[1];if(Math.max(Math.abs(dx),Math.abs(dy))>15)snakeDirection(...(Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)]));snakeTouch=null});
+
+
+const fullBtn=el("fullscreenToggle");
+fullBtn.onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch{alert("Din browser understøtter muligvis ikke fuldskærm her.")}};
+document.addEventListener("fullscreenchange",()=>{fullBtn.textContent=document.fullscreenElement?"⛶ Afslut fuldskærm":"⛶ Fuldskærm"});
+const widgetArea=el("widgetArea"),toolsWidgets=el("toolsWidgets");
+const widgetIds=["links","search","holiday","theme","schedule"];
+// All widgets share one column so they can be reordered freely.
+for(const widget of [...toolsWidgets.querySelectorAll(".widget")])widgetArea.insertBefore(widget,el("schedule"));
+toolsWidgets.remove();
+function saveWidgetOrder(){try{localStorage.setItem("skoleboard-widget-order-v1",JSON.stringify([...widgetArea.querySelectorAll(":scope > .widget")].map(w=>w.dataset.widget)))}catch{}}
+try{const saved=JSON.parse(localStorage.getItem("skoleboard-widget-order-v1")||"null");if(Array.isArray(saved))for(const id of saved){const w=[...widgetArea.children].find(x=>x.dataset.widget===id);if(w)widgetArea.appendChild(w)}}catch{}
+function addWidgetControls(){for(const w of widgetArea.querySelectorAll(":scope > .widget")){const handle=w.querySelector(".widget-handle");if(!handle)continue;const controls=handle.querySelector(".widget-move");for(const [arrow,delta] of [["↑",-1],["↓",1]]){const b=document.createElement("button");b.type="button";b.textContent=arrow;b.setAttribute("aria-label",arrow==="↑"?"Flyt op":"Flyt ned");b.onclick=()=>{const all=[...widgetArea.querySelectorAll(":scope > .widget")],idx=all.indexOf(w),other=all[idx+delta];if(!other)return;if(delta<0)widgetArea.insertBefore(w,other);else widgetArea.insertBefore(other,w);saveWidgetOrder()};controls.appendChild(b)}
+ w.draggable=true;w.addEventListener("dragstart",e=>{if(e.target.closest("input,button,select,textarea")){e.preventDefault();return}w.classList.add("dragging");e.dataTransfer.setData("text/plain",w.dataset.widget);e.dataTransfer.effectAllowed="move"});
+ w.addEventListener("dragend",()=>{w.classList.remove("dragging");widgetArea.querySelectorAll(".drop-target").forEach(x=>x.classList.remove("drop-target"))});
+ w.addEventListener("dragover",e=>{e.preventDefault();w.classList.add("drop-target")});
+ w.addEventListener("dragleave",()=>w.classList.remove("drop-target"));
+ w.addEventListener("drop",e=>{e.preventDefault();w.classList.remove("drop-target");const source=[...widgetArea.children].find(x=>x.dataset.widget===e.dataTransfer.getData("text/plain"));if(!source||source===w)return;const rect=w.getBoundingClientRect();widgetArea.insertBefore(source,e.clientY<rect.top+rect.height/2?w:w.nextSibling);saveWidgetOrder()});
+}}
+addWidgetControls();
 
 const gamesModal=el("gamesModal"),gameMenu=el("gameMenu"),flappyScreen=el("flappyScreen");
 const canvas=el("flappyCanvas"),ctx=canvas.getContext("2d");
