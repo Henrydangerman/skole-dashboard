@@ -158,8 +158,8 @@ render();
 
 
 
-const scheduleKey="skoleboard-schedule-clean-v4",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
-const scheduleTemplate=[[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["IDR"],["F/K"],["HDSv"],["HIS"],["MAT"]],[["IDR"],["F/K"],["HDSv"],["MAT"],["MAT"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["BIO"],["MAT"],["DAN"],["MAT"],[]],[["ENG"],[],["DAN"],["LVF"],[]],[[],[],["DAN"],[],[]]];
+const scheduleKey="skoleboard-schedule-clean-v5",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
+const scheduleTemplate=[[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["IDR"],["F/K"],["HDSv"],["HIS"],["MAT"]],[["IDR"],["F/K"],["HDSv"],["MAT"],["MAT"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["BIO"],["MAT"],["DAN"],["MAT"],[]],[["ENG"],[],["DAN"],[],[]],[[],[],["DAN"],[],[]]];
 let scheduleData={};try{const saved=JSON.parse(localStorage.getItem(scheduleKey)||"{}");if(saved&&typeof saved==="object")scheduleData=saved}catch{}
 const subjectColors={"SAM":"#8e72d9","DAN":"#4f95e8","ENG":"#35bba7","TYS":"#dc8e52","IDR":"#df6a91","F/K":"#c5a34b","HDSV":"#a86bd4","HIS":"#b68d58","MAT":"#4f9ad1","BIO":"#53ae70","LVF":"#c47cba","GEO":"#4ca6a6","KRI":"#b5a36a","SPISE":"#e5b84c","PAUSE":"#e5b84c"};
 function refreshSubjectColors(){el("scheduleTable").querySelectorAll(".lesson-box").forEach(box=>{const input=box.querySelector("input");if(input)box.style.setProperty("--subject-color",subjectColors[input.value.trim().toUpperCase()]||"#5b83ac")})}
