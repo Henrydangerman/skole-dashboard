@@ -113,6 +113,19 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 #dinoCanvas{width:min(100%,600px);image-rendering:pixelated;touch-action:none}#pongCanvas,#breakoutCanvas{display:block;width:min(100%,360px);height:auto;margin:12px auto;border-radius:12px;background:#091c37;touch-action:none}.tic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:330px;margin:18px auto}.tic-grid button{aspect-ratio:1;border:2px solid #5a8bbb;border-radius:12px;background:#16395f;color:white;font-size:48px;font-weight:700;cursor:pointer}.tic-grid button:disabled{cursor:default;opacity:1}
 
 #animatedBgCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}main{position:relative;z-index:1}#controlToggle,#fullscreenToggle{z-index:21}.animated-bg-options{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.animated-bg-options button{padding:9px 12px;border:1px solid #47709a;background:#142e51;color:#e7f2ff;border-radius:10px}.animated-bg-options button[aria-pressed="true"]{background:var(--accent);border-color:#b4d8ff}.animated-bg-options button:focus-visible{outline:3px solid #fff;outline-offset:2px}@media(prefers-reduced-motion:reduce){#animatedBgCanvas{display:none}}
+
+/* Skemaets grundfarver følger det valgte farvetema. Fagfarver og den gule aktuelle lektion bevares. */
+#schedule{background:color-mix(in srgb,var(--panel) 88%,#07152c);border-color:color-mix(in srgb,var(--accent) 55%,#315779)}
+#schedule .schedule-table th{background:color-mix(in srgb,var(--accent) 28%,#101e34);color:#f0f6ff}
+#schedule .schedule-table th.today{background:color-mix(in srgb,var(--accent) 65%,#132b48)}
+#schedule .schedule-table th small{background:color-mix(in srgb,var(--accent) 30%,#182d47);color:#f0f6ff}
+#schedule .schedule-table td{background:color-mix(in srgb,var(--panel) 78%,#07172c)}
+#schedule .schedule-table td.today{background:color-mix(in srgb,var(--accent) 28%,var(--panel))}
+#schedule .schedule-table td.lesson-index{background:color-mix(in srgb,var(--panel) 85%,#07152c);color:#d3e2f5}
+#schedule .lesson-box{background:color-mix(in srgb,var(--accent) 19%,#10243e);border-color:var(--subject-color,#5b83ac)}
+#schedule .lunch-row .lesson-box{background:color-mix(in srgb,var(--accent) 24%,#14243b)}
+#schedule .lesson-box input:focus{background:color-mix(in srgb,var(--accent) 45%,#10243e);outline-color:var(--accent)}
+#schedule .ghost{background:color-mix(in srgb,var(--accent) 28%,#172a43)}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
