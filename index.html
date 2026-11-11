@@ -189,8 +189,10 @@ function updateCurrentLesson(){
   }
  }
 }
-updateCurrentLesson();setInterval(updateCurrentLesson,15000);
 renderSchedule();
+updateCurrentLesson();
+setInterval(updateCurrentLesson,15000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)updateCurrentLesson()});
 const schoolHolidays=[
  {name:"🎄 Juleferie",start:"2026-12-19",end:"2027-01-04"},
  {name:"❄️ Vinterferie (uge 8)",start:"2027-02-20",end:"2027-02-28"},
