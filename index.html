@@ -156,13 +156,13 @@ render();
 
 
 
-const scheduleKey="skoleboard-schedule-clean-v3",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
-const scheduleTemplate=[[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["PAUSE"],["PAUSE"],["PAUSE"],["PAUSE"],["PAUSE"]],[["IDR"],["F/K"],["HDSv"],["HIS"],["MAT"]],[["IDR"],["F/K"],["HDSv"],["MAT"],["MAT"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["BIO"],["MAT"],["DAN"],["MAT"],[]],[["ENG"],[],["DAN"],["LVF"],[]],[[],[],["DAN"],[],[]]];
+const scheduleKey="skoleboard-schedule-clean-v4",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
+const scheduleTemplate=[[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["IDR"],["F/K"],["HDSv"],["HIS"],["MAT"]],[["IDR"],["F/K"],["HDSv"],["MAT"],["MAT"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["BIO"],["MAT"],["DAN"],["MAT"],[]],[["ENG"],[],["DAN"],["LVF"],[]],[[],[],["DAN"],[],[]]];
 let scheduleData={};try{const saved=JSON.parse(localStorage.getItem(scheduleKey)||"{}");if(saved&&typeof saved==="object")scheduleData=saved}catch{}
 function renderSchedule(){
  const today=new Date().getDay()-1;
  let h="<thead><tr><th></th>"+scheduleDays.map((d,i)=>'<th class="'+(i===today?"today":"")+'">'+d+'</th>').join("")+"</tr></thead><tbody>";
- for(let row=0;row<scheduleTemplate.length;row++){h+='<tr class="'+([2,5].includes(row)?"lunch-row":"")+'"><td class="lesson-index">'+(row===2||row===5?"Pause":row<2?row+1:row<5?row:row-1)+(row===2||row===5?"":".")+"</td>";
+ for(let row=0;row<scheduleTemplate.length;row++){h+='<tr class="'+([2,5].includes(row)?"lunch-row":"")+'"><td class="lesson-index">'+(row===2?"Spise":row===5?"Pause":row<2?row+1:row<5?row:row-1)+(row===2||row===5?"":".")+"</td>";
  for(let day=0;day<5;day++){const slots=scheduleTemplate[row][day];h+='<td data-day="'+day+'" data-row="'+row+'" class="'+(day===today?"today":"")+'"><div class="lesson-splits">';
  for(let n=0;n<slots.length;n++){const key=day+"-"+row+"-"+n,parts=(scheduleData[key]??slots[n]).split("|");h+='<div class="lesson-box"><input data-key="'+key+'" data-part="0" aria-label="'+scheduleDays[day]+' fag" value="'+esc(parts[0]||"")+'"></div>'}
  h+="</div></td>"}h+="</tr>"}
