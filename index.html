@@ -110,6 +110,7 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 @media(max-width:450px){.control-actions,.control-visibility{grid-template-columns:1fr}}
 
 .school-status{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}.school-status>div{background:#0a2442;border:1px solid #315779;border-radius:13px;padding:15px;min-width:0}.school-status span{display:block;color:#a8c6e8;font-size:13px;margin-bottom:7px}.school-status strong{display:block;font-size:clamp(15px,2vw,21px);overflow-wrap:anywhere}.school-status small{display:block;color:#b5cde7;margin-top:7px}.school-progress-track{height:11px;border-radius:20px;background:#294868;overflow:hidden;margin-top:14px}#schoolProgressFill{height:100%;width:0%;background:linear-gradient(90deg,#3ba8ff,#5fe3bc);border-radius:20px;transition:width .5s}#schedule .lesson-box{background:color-mix(in srgb,var(--subject-color,#5b83ac) 26%,#0b2441);border:2px solid var(--subject-color,#5b83ac);border-radius:6px}#schedule .lesson-box input{background:transparent}#schedule td.current-slot .lesson-box{background:#ffe17a!important;border-color:#bd8e13!important}@media(max-width:650px){main{padding:14px!important;width:100%;max-width:100%;overflow-x:hidden}.panel{padding:14px;margin-top:14px;border-radius:13px}.top{gap:8px}.school-status{grid-template-columns:1fr;gap:8px}#schedule{padding:12px!important;max-width:100%!important}.schedule-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}#schedule .schedule-table{min-width:680px!important}#schedule .schedule-table th{font-size:11px;padding:7px 3px}#schedule .lesson-box input{font-size:13px!important}.control-window{width:100%;padding:15px}#controlToggle,#gamesToggle{bottom:12px;font-size:12px;padding:10px}#controlToggle{left:10px}#gamesToggle{right:10px}}
+#pongCanvas,#breakoutCanvas{display:block;width:min(100%,360px);height:auto;margin:12px auto;border-radius:12px;background:#091c37;touch-action:none}.tic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:330px;margin:18px auto}.tic-grid button{aspect-ratio:1;border:2px solid #5a8bbb;border-radius:12px;background:#16395f;color:white;font-size:48px;font-weight:700;cursor:pointer}.tic-grid button:disabled{cursor:default;opacity:1}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
@@ -134,12 +135,12 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 <div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
  <div class="gamesWindow">
   <div class="gamesHeader"><h2>🎮 Spil</h2><button id="closeGames" class="ghost" type="button" aria-label="Luk spil">✕</button></div>
-  <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button><button id="playSnake" class="primary" type="button" style="margin-top:12px;background:#169b70">🐍 Snake – Spil nu</button></div>
+  <div id="gameMenu"><button id="playFlappy" class="primary" type="button">🐤 Flappy Bird – Spil nu</button><button id="playSnake" class="primary" type="button" style="margin-top:12px;background:#169b70">🐍 Snake – Spil nu</button><button id="playPong" class="primary" type="button" style="margin-top:12px;background:#7659ba">🏓 Pong – Spil nu</button><button id="playBreakout" class="primary" type="button" style="margin-top:12px;background:#bc653a">🧱 Breakout – Spil nu</button><button id="playTic" class="primary" type="button" style="margin-top:12px;background:#277c9a">❌ Kryds og bolle – Spil nu</button></div>
   <div id="flappyScreen" class="hidden"><canvas id="flappyCanvas" width="360" height="440" aria-label="Flappy Bird spil"></canvas><p class="gameHint">Tryk på mellemrum, klik eller tryk på spillet for at flyve. Tryk igen for at starte forfra.</p><button id="backToGames" class="ghost" type="button">← Tilbage til spil</button></div>
   
   
   <div id="snakeScreen" class="hidden"><canvas id="snakeCanvas" width="320" height="320" aria-label="Snake spil"></canvas><p class="gameHint">Brug piletasterne eller WASD. På mobil: swipe for at styre.</p><p id="snakeRecord" class="gameHint">🏆 Rekord: 0</p><button id="snakeRestart" class="primary" type="button">Start forfra</button> <button id="snakeBack" class="ghost" type="button">← Tilbage til spil</button></div>
- </div>
+ <div id="pongScreen" class="hidden"><canvas id="pongCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt musen eller fingeren for at styre battet. Først til 5 vinder!</p><button id="pongRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="breakoutScreen" class="hidden"><canvas id="breakoutCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt battet med musen eller fingeren, og slå alle klodserne væk.</p><button id="breakoutRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="ticScreen" class="hidden"><p class="gameHint" id="ticStatus">Din tur: ❌</p><div id="ticGrid" class="tic-grid"></div><button id="ticRestart" class="primary">Nyt spil</button> <button class="ghost" data-game-back>← Tilbage</button></div></div>
 </div>
 <script>
 const storageKey="skolehub-links-v1";const defaults=[{id:"default-aula",name:"Aula",url:"https://www.aula.dk/"},{id:"default-meebook",name:"Meebook",url:"https://www.meebook.com/"},{id:"default-classroom",name:"Google Classroom",url:"https://classroom.google.com/"}];let links=[];try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");if(Array.isArray(saved))links=saved.filter(x=>x&&typeof x.name==="string"&&typeof x.url==="string");else links=[...defaults]}catch{links=[...defaults]}for(const item of defaults){if(!links.some(x=>x.id===item.id||x.name.toLowerCase()===item.name.toLowerCase()))links.push(item)}localStorage.setItem(storageKey,JSON.stringify(links));let editing=null;
@@ -326,7 +327,7 @@ function gameLoop(t){if(gamesModal.classList.contains("hidden")||flappyScreen.cl
  drawFlappy();raf=requestAnimationFrame(gameLoop)}
 function startLoop(){if(!raf)raf=requestAnimationFrame(gameLoop)}
 el("gamesToggle").onclick=()=>{gamesModal.classList.remove("hidden");gameMenu.classList.remove("hidden");flappyScreen.classList.add("hidden");snakeScreen.classList.add("hidden");snakeStop()};
-el("closeGames").onclick=()=>{gamesModal.classList.add("hidden");gameState="ready";snakeStop()};
+el("closeGames").onclick=()=>{arcadeStop();gamesModal.classList.add("hidden");gameState="ready";snakeStop()};
 el("playFlappy").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.remove("hidden");snakeScreen.classList.add("hidden");snakeStop();resetFlappy();startLoop()};
 el("backToGames").onclick=()=>{flappyScreen.classList.add("hidden");gameMenu.classList.remove("hidden");gameState="ready"};
 canvas.addEventListener("pointerdown",flap);
@@ -335,6 +336,42 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!gamesModal.classLi
 
 
 gamesModal.addEventListener("click",e=>{if(e.target===gamesModal){gamesModal.classList.add("hidden");gameState="ready"}});
+
+
+const extraGames=["pongScreen","breakoutScreen","ticScreen"];
+let arcadeTimer=null,arcadeMode="",arcade={};
+function arcadeStop(){if(arcadeTimer)clearInterval(arcadeTimer);arcadeTimer=null;arcadeMode=""}
+function arcadeOpen(id){arcadeStop();snakeStop();gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");snakeScreen.classList.add("hidden");extraGames.forEach(x=>el(x).classList.toggle("hidden",x!==id))}
+function arcadeBack(){arcadeStop();extraGames.forEach(x=>el(x).classList.add("hidden"));gameMenu.classList.remove("hidden")}
+document.querySelectorAll("[data-game-back]").forEach(b=>b.onclick=arcadeBack);
+function arcadePointer(canvas,cb){const update=e=>{const rect=canvas.getBoundingClientRect();cb(Math.max(0,Math.min(360,(e.clientX-rect.left)*360/rect.width)))};canvas.addEventListener("pointermove",update);canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);update(e)})}
+const pc=el("pongCanvas"),pg=pc.getContext("2d");
+arcadePointer(pc,x=>{if(arcadeMode==="pong")arcade.paddle=x});
+function pongServe(dir){arcade.ball={x:180,y:200,vx:(Math.random()>.5?2.7:-2.7),vy:dir*3.3}}
+function pongStart(){arcadeStop();arcadeMode="pong";arcade={paddle:180,cpu:180,player:0,bot:0};pongServe(1);arcadeTimer=setInterval(pongStep,1000/60)}
+function pongStep(){if(arcadeMode!=="pong")return;const a=arcade,b=a.ball,g=pg;g.fillStyle="#091c37";g.fillRect(0,0,360,400);g.setLineDash([8,8]);g.strokeStyle="#4b7397";g.beginPath();g.moveTo(0,200);g.lineTo(360,200);g.stroke();g.setLineDash([]);
+ if(!a.winner){a.cpu+=Math.max(-2.7,Math.min(2.7,b.x-a.cpu));b.x+=b.vx;b.y+=b.vy;if(b.x<8||b.x>352)b.vx*=-1;
+ if(b.vy>0&&b.y>=366&&b.y<380&&Math.abs(b.x-a.paddle)<49){b.y=366;b.vy=-Math.abs(b.vy)*1.03;b.vx+=(b.x-a.paddle)*.045}
+ if(b.vy<0&&b.y<=34&&b.y>20&&Math.abs(b.x-a.cpu)<49){b.y=34;b.vy=Math.abs(b.vy)*1.03;b.vx+=(b.x-a.cpu)*.045}
+ if(b.y>408){a.bot++;pongServe(-1)}if(b.y< -8){a.player++;pongServe(1)}
+ if(a.player>=5||a.bot>=5)a.winner=a.player>=5?"Du vandt!":"Computeren vandt!"}
+ g.fillStyle="#70c7ff";g.fillRect(a.paddle-45,376,90,9);g.fillStyle="#ffb477";g.fillRect(a.cpu-45,15,90,9);g.fillStyle="white";g.beginPath();g.arc(b.x,b.y,7,0,Math.PI*2);g.fill();g.textAlign="center";g.font="bold 22px system-ui";g.fillText(a.bot+" : "+a.player,180,196);if(a.winner){g.font="bold 24px system-ui";g.fillText(a.winner,180,245)}}
+el("playPong").onclick=()=>{arcadeOpen("pongScreen");pongStart()};el("pongRestart").onclick=pongStart;
+const bc=el("breakoutCanvas"),bg=bc.getContext("2d");
+arcadePointer(bc,x=>{if(arcadeMode==="breakout")arcade.paddle=x});
+function breakoutStart(){arcadeStop();arcadeMode="breakout";arcade={paddle:180,ball:{x:180,y:320,vx:2.7,vy:-3.5},bricks:Array.from({length:5},(_,row)=>Array.from({length:8},(_,col)=>({x:11+col*43,y:40+row*24,alive:true}))).flat(),score:0,lives:3};arcadeTimer=setInterval(breakoutStep,1000/60)}
+function breakoutStep(){if(arcadeMode!=="breakout")return;const a=arcade,b=a.ball,g=bg;g.fillStyle="#091c37";g.fillRect(0,0,360,400);
+ if(!a.winner){b.x+=b.vx;b.y+=b.vy;if(b.x<8||b.x>352)b.vx*=-1;if(b.y<8)b.vy=Math.abs(b.vy);
+ if(b.vy>0&&b.y>=367&&b.y<=383&&Math.abs(b.x-a.paddle)<44){b.y=367;b.vy=-Math.abs(b.vy);b.vx=(b.x-a.paddle)*.09}
+ for(const brick of a.bricks){if(brick.alive&&b.x>brick.x-6&&b.x<brick.x+43&&b.y>brick.y-6&&b.y<brick.y+23){brick.alive=false;b.vy*=-1;a.score++;break}}
+ if(b.y>410){a.lives--;b.x=180;b.y=320;b.vx=2.7;b.vy=-3.5}if(a.lives<=0)a.winner="Game over";if(a.score===40)a.winner="Du vandt!"}
+ const colors=["#f26d6d","#f6ad57","#ffe16a","#69d5a0","#6fa9ff"];a.bricks.forEach((brick,i)=>{if(brick.alive){g.fillStyle=colors[Math.floor(i/8)];g.fillRect(brick.x,brick.y,38,18)}});g.fillStyle="#7bc6ff";g.fillRect(a.paddle-40,377,80,10);g.fillStyle="#fff";g.beginPath();g.arc(b.x,b.y,6,0,Math.PI*2);g.fill();g.font="bold 17px system-ui";g.textAlign="left";g.fillText("Point: "+a.score,12,25);g.textAlign="right";g.fillText("Liv: "+a.lives,348,25);if(a.winner){g.textAlign="center";g.font="bold 26px system-ui";g.fillText(a.winner,180,235)}}
+el("playBreakout").onclick=()=>{arcadeOpen("breakoutScreen");breakoutStart()};el("breakoutRestart").onclick=breakoutStart;
+let ticCells=[],ticOver=false;
+function ticWinner(c){for(const [a,b,d] of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]])if(c[a]&&c[a]===c[b]&&c[b]===c[d])return c[a];return c.every(Boolean)?"draw":null}
+function ticRender(){const grid=el("ticGrid");grid.replaceChildren();ticCells.forEach((v,i)=>{const btn=document.createElement("button");btn.textContent=v;btn.disabled=!!v||ticOver;btn.setAttribute("aria-label","Felt "+(i+1));btn.onclick=()=>{ticCells[i]="❌";const result=ticWinner(ticCells);if(!result){const empty=ticCells.map((v,j)=>v?-1:j).filter(j=>j>=0);const winning=empty.find(j=>{const copy=[...ticCells];copy[j]="⭕";return ticWinner(copy)==="⭕"});const block=empty.find(j=>{const copy=[...ticCells];copy[j]="❌";return ticWinner(copy)==="❌"});ticCells[winning??block??(empty.includes(4)?4:empty[Math.floor(Math.random()*empty.length)])]="⭕"}const winner=ticWinner(ticCells);ticOver=!!winner;el("ticStatus").textContent=winner==="draw"?"Uafgjort!":winner?winner+" vandt!":"Din tur: ❌";ticRender()};grid.append(btn)})}
+function ticStart(){ticCells=Array(9).fill("");ticOver=false;el("ticStatus").textContent="Din tur: ❌";ticRender()}
+el("playTic").onclick=()=>{arcadeOpen("ticScreen");ticStart()};el("ticRestart").onclick=ticStart;
 
 const controlPanel=el("controlPanel"),controlToggle=el("controlToggle");
 const controlWidgetNames={links:"🔗 Links",search:"🔎 Google-søgning",holiday:"🏖️ Ferie",theme:"🎨 Tema",schedule:"📅 Skoleskema"};
