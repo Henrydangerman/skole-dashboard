@@ -131,7 +131,7 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
 </main>
 
 <button id="controlToggle" type="button" class="primary">⚙️ Kontrolpanel</button>
-<div id="controlPanel" class="hidden" role="dialog" aria-modal="true" aria-label="Rediger SkoleBoard"><div class="control-window"><div class="control-head"><h2>⚙️ Kontrolpanel</h2><button id="closeControl" class="ghost" type="button">✕</button></div><p class="control-note">Tilpas SkoleBoard direkte, uden ChatGPT.</p><div class="control-actions"><button id="controlAddLink" class="primary" type="button">＋ Tilføj link</button><button id="controlEditSchedule" class="ghost" type="button">📅 Rediger skema</button><button id="controlTheme" class="ghost" type="button">🎨 Farver og baggrund</button><button id="controlReorder" class="ghost" type="button">↕️ Flyt bokse</button></div><h3>Vis eller skjul bokse</h3><div id="controlVisibility" class="control-visibility"></div><p class="control-note">Dine ændringer gemmes i denne browser. De ændrer ikke hjemmesiden for andre eller på dine andre enheder.</p></div></div>
+<div id="controlPanel" class="hidden" role="dialog" aria-modal="true" aria-label="Rediger SkoleBoard"><div class="control-window"><div class="control-head"><h2>⚙️ Kontrolpanel</h2><button id="closeControl" class="ghost" type="button">✕</button></div><p class="control-note">Tilpas SkoleBoard direkte, uden ChatGPT.</p><div class="control-actions"><button id="controlAddLink" class="primary" type="button">＋ Tilføj link</button><button id="controlEditSchedule" class="ghost" type="button">📅 Rediger skema</button><button id="controlTheme" class="ghost" type="button">🎨 Farver og baggrund</button><button id="controlReorder" class="ghost" type="button">↕️ Flyt bokse</button></div><h3>💾 Backup af indstillinger</h3><p class="control-note">Gem dine links, skema, tema, baggrund, widgets og spilrekorder i en fil. Importér filen for at gendanne indstillingerne, også på en anden enhed.</p><div class="control-actions"><button id="exportSettings" class="primary" type="button">⬇️ Download backup</button><button id="importSettings" class="ghost" type="button">⬆️ Importér backup</button><input id="importSettingsFile" type="file" accept=".json,application/json" hidden></div><p id="backupStatus" class="control-note" role="status" aria-live="polite"></p><h3>Vis eller skjul bokse</h3><div id="controlVisibility" class="control-visibility"></div><p class="control-note">Dine ændringer gemmes i denne browser. De ændrer ikke hjemmesiden for andre eller på dine andre enheder.</p></div></div>
 <button id="fullscreenToggle" type="button" class="ghost" title="Fuldskærm" aria-label="Slå fuldskærm til eller fra">⛶ Fuldskærm</button>
 <button id="gamesToggle" type="button" aria-label="Åbn spil">🎮 Spil</button>
 <div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
@@ -533,6 +533,48 @@ el("dinoRestart").onclick=dinoStart;
 dinoCanvas.addEventListener("pointerdown",e=>{e.preventDefault();dinoJump()});
 document.addEventListener("keydown",e=>{if(arcadeMode!=="dino"||gamesModal.classList.contains("hidden"))return;if(["Space","ArrowUp","ArrowDown"].includes(e.code)){e.preventDefault();if(e.code==="ArrowDown")dinoDown=true;else if(!e.repeat)dinoJump()}});
 document.addEventListener("keyup",e=>{if(e.code==="ArrowDown")dinoDown=false});
+
+
+const backupKeys=["skolehub-links-v1","skoleboard-schedule-clean-v5","skoleboard-theme","skoleboard-bg-color","skoleboard-background","skoleboard-animated-background-v1","skoleboard-widget-order-v1","skoleboard-hidden-widgets-v1","skoleboard-flappy-best-v1","skoleboard-snake-best-v1","skoleboard-dino-best-v1"];
+function backupStatus(message){el("backupStatus").textContent=message}
+el("exportSettings").onclick=()=>{
+ try{
+  const settings={};for(const key of backupKeys){const value=localStorage.getItem(key);if(value!==null)settings[key]=value}
+  const backup={format:"skoleboard-settings",version:1,createdAt:new Date().toISOString(),settings};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob),link=document.createElement("a");
+  link.href=url;link.download="skoleboard-backup-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  backupStatus("Backupfilen er klar til at blive gemt.");
+ }catch(e){backupStatus("Kunne ikke lave backup: "+e.message)}
+};
+el("importSettings").onclick=()=>el("importSettingsFile").click();
+el("importSettingsFile").onchange=async e=>{
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ e.target.value="";
+ if(file.size>5*1024*1024){backupStatus("Filen er for stor (maks. 5 MB).");return}
+ try{
+  const data=JSON.parse(await file.text());
+  if(!data||data.format!=="skoleboard-settings"||data.version!==1||!data.settings||typeof data.settings!=="object"||Array.isArray(data.settings))throw Error("Filen er ikke en gyldig SkoleBoard-backup.");
+  const entries=Object.entries(data.settings);
+  if(entries.some(([key,value])=>!backupKeys.includes(key)||typeof value!=="string"))throw Error("Backupfilen indeholder ugyldige indstillinger.");
+  for(const [key,value] of entries){
+   if(key==="skoleboard-bg-color"&&!/^#[0-9a-fA-F]{6}$/.test(value))throw Error("Ugyldig baggrundsfarve.");
+   if(key==="skoleboard-background"&&!/^data:image\/(?:png|jpeg|webp|gif);base64,[a-zA-Z0-9+/=]+$/.test(value))throw Error("Ugyldigt baggrundsbillede.");
+   if(["skolehub-links-v1","skoleboard-schedule-clean-v5","skoleboard-widget-order-v1","skoleboard-hidden-widgets-v1"].includes(key))JSON.parse(value);
+  }
+  if(!confirm("Vil du gendanne indstillingerne fra backupfilen? Dine nuværende indstillinger bliver erstattet, og siden genindlæses."))return;
+  const previous={};for(const key of backupKeys)previous[key]=localStorage.getItem(key);
+  try{
+   for(const key of backupKeys)localStorage.removeItem(key);
+   for(const [key,value] of entries)localStorage.setItem(key,value);
+  }catch(err){
+   for(const key of backupKeys){try{if(previous[key]===null)localStorage.removeItem(key);else localStorage.setItem(key,previous[key])}catch{}}
+   throw Error("Der er ikke nok plads i browseren til at importere denne backup.");
+  }
+  location.reload();
+ }catch(err){backupStatus("Import mislykkedes: "+err.message)}
+};
 
 const controlPanel=el("controlPanel"),controlToggle=el("controlToggle");
 const controlWidgetNames={links:"🔗 Links",search:"🔎 Google-søgning",holiday:"🏖️ Ferie",theme:"🎨 Tema",schedule:"📅 Skoleskema"};
