@@ -295,16 +295,15 @@ function dunkDraw(){
   g.strokeStyle="#ffb36b";g.lineWidth=2;g.beginPath();g.moveTo(x-31,y-2);g.lineTo(x+31,y-2);g.stroke();
  }
  g.save();g.translate(83,dunkY);g.rotate(Math.max(-.45,Math.min(.7,dunkVy*.075)));
- // Short rounded Flappy Bird-style wings, flapping from the sides.
- const flap=Math.sin(dunkWingBeat)*.8;
- for(const side of [-1,1]){g.save();g.scale(side,1);g.translate(11,2);g.rotate(flap*.7);
- g.fillStyle="#fffdf2";g.strokeStyle="#a9bccc";g.lineWidth=2;
- g.beginPath();g.moveTo(-1,-3);g.quadraticCurveTo(12,-19,23,-11);g.quadraticCurveTo(33,-6,27,1);g.quadraticCurveTo(22,9,13,6);g.quadraticCurveTo(7,12,0,5);g.closePath();g.fill();g.stroke();
- g.strokeStyle="#c5d7e3";g.lineWidth=1.5;g.beginPath();g.moveTo(9,1);g.quadraticCurveTo(18,-4,24,-3);g.stroke();g.restore()}
+ // Same small oval, flapping wing style as the Flappy Bird game.
+ const wingPhase=Math.sin(dunkWingBeat);
+ for(const side of [-1,1]){g.save();g.scale(side,1);g.translate(12,3);g.rotate(-.25-wingPhase*.65);
+ g.lineJoin="round";g.lineWidth=2.8;g.strokeStyle="#3d3031";g.fillStyle="#fff6d2";
+ g.beginPath();g.ellipse(0,0,10,6,-.2,0,Math.PI*2);g.fill();g.stroke();g.restore()}
  g.fillStyle="#e97c23";g.strokeStyle="#65350e";g.lineWidth=2.5;g.beginPath();g.arc(0,0,15,0,Math.PI*2);g.fill();g.stroke();g.beginPath();g.moveTo(-15,0);g.lineTo(15,0);g.moveTo(0,-15);g.lineTo(0,15);g.moveTo(-11,-10);g.quadraticCurveTo(5,0,-11,10);g.moveTo(11,-10);g.quadraticCurveTo(-5,0,11,10);g.stroke();g.restore();
  for(const p of dunkParticles){g.globalAlpha=Math.max(0,p.life/28);g.fillStyle=p.color;g.beginPath();g.arc(p.x,p.y,p.radius,0,Math.PI*2);g.fill()}g.globalAlpha=1;
  if(dunkFlash>0){g.fillStyle="rgba(255,239,130,"+(dunkFlash/16*.22)+")";g.fillRect(0,0,360,440)}
- if(dunkStreak>1){g.fillStyle="#b45309";g.font="bold 17px system-ui";g.textAlign="center";g.fillText("🔥 x"+Math.pow(2,dunkStreak-1)+" combo",180,71)}
+ if(dunkStreak>1){g.fillStyle="#b45309";g.font="bold 17px system-ui";g.textAlign="center";g.fillText("🔥 Combo "+dunkStreak+" · +"+dunkStreak,180,71)}
  g.fillStyle="#154a76";g.textAlign="center";g.font="bold 29px system-ui";g.fillText(String(dunkScore),180,42);g.textAlign="right";g.font="bold 14px system-ui";g.fillText("🏆 "+dunkBest,347,27);
  if(dunkState!=="playing"){g.fillStyle="#082340bf";g.fillRect(35,155,290,112);g.fillStyle="#fff";g.textAlign="center";g.font="bold 25px system-ui";g.fillText(dunkState==="over"?"Game over!":"🏀 Flappy Dunk",180,197);g.font="15px system-ui";g.fillText(dunkState==="over"?"Tryk for at prøve igen":"Tryk for at hoppe gennem kurvene",180,228)}
 }
@@ -323,9 +322,20 @@ function dunkLoop(t){
   const speed=(2.05+Math.min(1.5,dunkScore*.035))*dt;
   for(const h of dunkHoops){
    h.x-=speed;
-   // Rim contact breaks the clean-shot streak but does not bounce the ball.
+   // The ball can settle on the rim, then slide/fall into the hoop.
+   // Rim contact ends the combo; there is no upward bounce.
    for(const rx of [h.x-32,h.x+32]){
-    if(Math.hypot(83-rx,dunkY-h.y)<18.5){h.touched=true;dunkStreak=0}
+    const dx=83-rx,dy=dunkY-h.y,dist=Math.hypot(dx,dy);
+    if(dist<18.5&&dist>0){
+     h.touched=true;dunkStreak=0;
+     if(prevY<=h.y&&dunkVy>=0&&Math.abs(dx)<19){
+      // Briefly support the ball on top, then let it roll off.
+      const push=(18.5-dist);
+      dunkY-=push*.75;
+      dunkVy=Math.min(dunkVy,.7);
+      dunkY+=.35*dt;
+     }
+    }
    }
    // Score only after the ball has fully crossed BELOW the hoop's rim.
    // Require that the ball first entered the hoop from above.
@@ -333,7 +343,7 @@ function dunkLoop(t){
    if(h.entered&&!h.passed&&dunkVy>0&&prevY-15<=h.y+27&&dunkY-15>=h.y+27&&Math.abs(h.x-83)<22){
     h.passed=true;
     dunkStreak=h.touched?0:dunkStreak+1;
-    const points=h.touched?1:Math.pow(2,Math.min(12,dunkStreak-1));
+    const points=h.touched?1:dunkStreak;
     dunkScore+=points;dunkBurst(83,h.y+22,!h.touched);
     if(dunkScore>dunkBest){dunkBest=dunkScore;try{localStorage.setItem("skoleboard-dunk-best-v1",String(dunkBest))}catch{}}
    }
