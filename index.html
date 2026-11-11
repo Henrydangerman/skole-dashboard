@@ -121,7 +121,7 @@ body[data-theme] .linkcard{border-color:color-mix(in srgb,var(--accent) 35%,#315
  <div class="panel widget" data-widget="holiday"><div class="widget-handle">⠿ Flyt nedtælling <span class="widget-move"></span></div><h3>🏖️ Nedtælling til ferie</h3><p id="holidayName" style="font-weight:700;margin:8px 0"></p><p id="holidayCountdown" class="muted" aria-live="off" style="font-size:clamp(24px,3vw,36px);font-weight:800;line-height:1.25;margin:16px 0;color:#eaf5ff">Nedtællingen indlæses...</p><details><summary style="cursor:pointer;color:#a9c1dd">Se alle kommende ferier</summary><div id="holidayList" class="muted" style="font-size:13px;line-height:1.8;margin-top:8px"></div></details></div>
  <div class="panel widget" data-widget="theme"><div class="widget-handle">⠿ Flyt temaer <span class="widget-move"></span></div><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><div id="themePicker" class="theme-picker" role="group" aria-label="Vælg farvetema"><button type="button" class="theme-option" data-theme-option="blue" aria-pressed="false"><span class="theme-swatch" style="background:#2777e8"></span>Blå</button><button type="button" class="theme-option" data-theme-option="purple" aria-pressed="false"><span class="theme-swatch" style="background:#8747df"></span>Lilla</button><button type="button" class="theme-option" data-theme-option="green" aria-pressed="false"><span class="theme-swatch" style="background:#168d79"></span>Grøn</button><button type="button" class="theme-option" data-theme-option="dark" aria-pressed="false"><span class="theme-swatch" style="background:#353f57"></span>Mørk</button><button type="button" class="theme-option" data-theme-option="pink" aria-pressed="false"><span class="theme-swatch" style="background:#d34b96"></span>Lyserød</button><button type="button" class="theme-option" data-theme-option="red" aria-pressed="false"><span class="theme-swatch" style="background:#d84b55"></span>Rød</button><button type="button" class="theme-option" data-theme-option="orange" aria-pressed="false"><span class="theme-swatch" style="background:#e17c31"></span>Orange</button><button type="button" class="theme-option" data-theme-option="cyan" aria-pressed="false"><span class="theme-swatch" style="background:#009fb5"></span>Turkis</button><button type="button" class="theme-option" data-theme-option="midnight" aria-pressed="false"><span class="theme-swatch" style="background:#465cbd"></span>Midnatsblå</button><button type="button" class="theme-option" data-theme-option="forest" aria-pressed="false"><span class="theme-swatch" style="background:#3c9860"></span>Skovgrøn</button><button type="button" class="theme-option" data-theme-option="sunset" aria-pressed="false"><span class="theme-swatch" style="background:#e46682"></span>Solnedgang</button><button type="button" class="theme-option" data-theme-option="gold" aria-pressed="false"><span class="theme-swatch" style="background:#bb8b26"></span>Guld</button></div><label for="bgColor">Baggrundsfarve</label><div id="bgPresets" class="bg-presets" role="group" aria-label="Baggrundsfarver"></div><div class="bg-color-row"><input id="bgColor" type="color" value="#07152c" aria-label="Vælg baggrundsfarve"><button id="resetBgColor" class="ghost" type="button">Nulstil farve</button></div><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
 </div>
-<section class="panel widget" data-widget="schedule"><div class="widget-handle">⠿ Flyt skoleskema <span class="widget-move"></span></div><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2><button id="clearSchedule" class="ghost" type="button">Ryd skema</button></div><p class="muted">Skemaet er indsat fra dit billede. Du kan rette fag og lærere direkte i felterne.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section></div>
+<section class="panel widget" data-widget="schedule"><div class="widget-handle">⠿ Flyt skoleskema <span class="widget-move"></span></div><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2></div><p class="muted">Skemaet er indsat fra dit billede. Du kan rette fag og lærere direkte i felterne.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section></div>
 
 </main>
 
@@ -156,144 +156,8 @@ render();
 
 
 
-const scheduleKey="skoleboard-schedule-clean-v1",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
-const scheduleTemplate=[
- [
-  [
-   "SAM"
-  ],
-  [
-   "DAN"
-  ],
-  [
-   "ENG"
-  ],
-  [
-   "TYS"
-  ],
-  [
-   "DAN"
-  ]
- ],
- [
-  [
-   "SAM"
-  ],
-  [
-   "DAN"
-  ],
-  [
-   "ENG"
-  ],
-  [
-   "TYS"
-  ],
-  [
-   "DAN"
-  ]
- ],
- [
-  [
-   "IDR"
-  ],
-  [
-   "F/K"
-  ],
-  [
-   "HDSv",
-   "MADv"
-  ],
-  [
-   "HIS"
-  ],
-  [
-   "MAT"
-  ]
- ],
- [
-  [
-   "IDR"
-  ],
-  [
-   "F/K"
-  ],
-  [
-   "HDSv",
-   "MADv"
-  ],
-  [
-   "MAT"
-  ],
-  [
-   "MAT"
-  ]
- ],
- [
-  [
-   "SPISE"
-  ],
-  [
-   "SPISE"
-  ],
-  [
-   "SPISE",
-   "SPISE"
-  ],
-  [
-   "SPISE"
-  ],
-  [
-   "SPISE"
-  ]
- ],
- [
-  [
-   "BIO"
-  ],
-  [
-   "MAT"
-  ],
-  [
-   "DAN"
-  ],
-  [
-   "MAT"
-  ],
-  [
-   "TYS"
-  ]
- ],
- [
-  [
-   "ENG"
-  ],
-  [
-   "HIS"
-  ],
-  [
-   "DAN"
-  ],
-  [
-   "LVF"
-  ],
-  [
-   "KRI"
-  ]
- ],
- [
-  [],
-  [
-   "GEO"
-  ],
-  [
-   "DAN"
-  ],
-  [
-   "LVF"
-  ],
-  []
- ]
-];
+const scheduleKey="skoleboard-schedule-clean-v2",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
+const scheduleTemplate=[[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["SAM"],["DAN"],["ENG"],["TYS"],["DAN"]],[["IDR"],["F/K"],["HDSv"],["HIS"],["MAT"]],[["IDR"],["F/K"],["HDSv"],["MAT"],["MAT"]],[["SPISE"],["SPISE"],["SPISE"],["SPISE"],["SPISE"]],[["BIO"],["MAT"],["DAN"],["MAT"],["TYS"]],[["ENG"],["HIS"],["DAN"],["LVF"],["KRI"]],[[],["GEO"],["DAN"],["LVF"],[]]];
 let scheduleData={};try{const saved=JSON.parse(localStorage.getItem(scheduleKey)||"{}");if(saved&&typeof saved==="object")scheduleData=saved}catch{}
 function renderSchedule(){
  const today=new Date().getDay()-1;
@@ -326,8 +190,7 @@ function updateCurrentLesson(){
  }
 }
 updateCurrentLesson();setInterval(updateCurrentLesson,15000);
-renderSchedule();el("clearSchedule").textContent="Gendan originalt skema";
-el("clearSchedule").onclick=()=>{if(confirm("Vil du gendanne skemaet fra billedet? Dine egne ændringer bliver slettet.")){scheduleData={};localStorage.removeItem(scheduleKey);renderSchedule();updateCurrentLesson()}};
+renderSchedule();
 const schoolHolidays=[
  {name:"🎄 Juleferie",start:"2026-12-19",end:"2027-01-04"},
  {name:"❄️ Vinterferie (uge 8)",start:"2027-02-20",end:"2027-02-28"},
