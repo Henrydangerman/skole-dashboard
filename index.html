@@ -156,24 +156,151 @@ render();
 
 
 
-const scheduleKey="skoleboard-schedule-original-v3",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
+const scheduleKey="skoleboard-schedule-clean-v1",scheduleDays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag"];
 const scheduleTemplate=[
- [["SAM|U2, HT"],["DAN|U2, MK"],["ENG|U2, RW"],["TYS|U2, BC"],["DAN|U2, MK"]],
- [["SAM|U2, HT"],["DAN|U2, MK"],["ENG|U2, RW"],["TYS|U2, BC"],["DAN|U2, MK"]],
- [["IDR|U2, SI"],["F/K|U2, MUA","Hold|U2, SI"],["HDSv|U2, SI","Hold|U2, IE","MADv|U2, MK"],["HIS|U2, HT"],["MAT|U2, SI"]],
- [["IDR|U2, SI"],["F/K|U2, MUA","Hold|U2, SI"],["HDSv|U2, SI","Hold|U2, IE","MADv|U2, MK"],["Hold|U2, MK","MAT|U2, SI"],["Hold|U2, RW","MAT|U2, SI"]],
- [["SPISE|U2, SI"],["SPISE|U2, MUA"],["SPISE|U2, SI","SPISE|U2, MK"],["SPISE|U2, SI"],["SPISE|U2, SI"]],
- [["BIO|U2, HH"],["MAT|U2, SI"],["DAN|U2, MK"],["Hold|U2, MK","MAT|U2, SI"],["TYS|U2, BC"]],
- [["ENG|U2, RW"],["HIS|U2, HT"],["DAN|U2, MK"],["LVF|U2, RW"],["KRI|U2, HT"]],
- [[],["GEO|U2, HH"],["DAN|U2, MK"],["LVF|U2, RW"],[]]
+ [
+  [
+   "SAM"
+  ],
+  [
+   "DAN"
+  ],
+  [
+   "ENG"
+  ],
+  [
+   "TYS"
+  ],
+  [
+   "DAN"
+  ]
+ ],
+ [
+  [
+   "SAM"
+  ],
+  [
+   "DAN"
+  ],
+  [
+   "ENG"
+  ],
+  [
+   "TYS"
+  ],
+  [
+   "DAN"
+  ]
+ ],
+ [
+  [
+   "IDR"
+  ],
+  [
+   "F/K"
+  ],
+  [
+   "HDSv",
+   "MADv"
+  ],
+  [
+   "HIS"
+  ],
+  [
+   "MAT"
+  ]
+ ],
+ [
+  [
+   "IDR"
+  ],
+  [
+   "F/K"
+  ],
+  [
+   "HDSv",
+   "MADv"
+  ],
+  [
+   "MAT"
+  ],
+  [
+   "MAT"
+  ]
+ ],
+ [
+  [
+   "SPISE"
+  ],
+  [
+   "SPISE"
+  ],
+  [
+   "SPISE",
+   "SPISE"
+  ],
+  [
+   "SPISE"
+  ],
+  [
+   "SPISE"
+  ]
+ ],
+ [
+  [
+   "BIO"
+  ],
+  [
+   "MAT"
+  ],
+  [
+   "DAN"
+  ],
+  [
+   "MAT"
+  ],
+  [
+   "TYS"
+  ]
+ ],
+ [
+  [
+   "ENG"
+  ],
+  [
+   "HIS"
+  ],
+  [
+   "DAN"
+  ],
+  [
+   "LVF"
+  ],
+  [
+   "KRI"
+  ]
+ ],
+ [
+  [],
+  [
+   "GEO"
+  ],
+  [
+   "DAN"
+  ],
+  [
+   "LVF"
+  ],
+  []
+ ]
 ];
 let scheduleData={};try{const saved=JSON.parse(localStorage.getItem(scheduleKey)||"{}");if(saved&&typeof saved==="object")scheduleData=saved}catch{}
 function renderSchedule(){
  const today=new Date().getDay()-1;
- let h="<thead><tr><th></th>"+scheduleDays.map((d,i)=>'<th class="'+(i===today?"today":"")+'">'+d+'<small>AJN</small></th>').join("")+"</tr></thead><tbody>";
+ let h="<thead><tr><th></th>"+scheduleDays.map((d,i)=>'<th class="'+(i===today?"today":"")+'">'+d+'</th>').join("")+"</tr></thead><tbody>";
  for(let row=0;row<8;row++){h+='<tr class="'+(row===4?"lunch-row":"")+'"><td class="lesson-index">'+(row===4?"Pause":row<4?row+1:row)+'.</td>';
  for(let day=0;day<5;day++){const slots=scheduleTemplate[row][day];h+='<td data-day="'+day+'" data-row="'+row+'" class="'+(day===today?"today":"")+'"><div class="lesson-splits">';
- for(let n=0;n<slots.length;n++){const key=day+"-"+row+"-"+n,parts=(scheduleData[key]??slots[n]).split("|");h+='<div class="lesson-box"><input data-key="'+key+'" data-part="0" aria-label="'+scheduleDays[day]+' fag" value="'+esc(parts[0]||"")+'"><input data-key="'+key+'" data-part="1" aria-label="'+scheduleDays[day]+' lokale og lærer" value="'+esc(parts.slice(1).join("|")||"")+'"></div>'}
+ for(let n=0;n<slots.length;n++){const key=day+"-"+row+"-"+n,parts=(scheduleData[key]??slots[n]).split("|");h+='<div class="lesson-box"><input data-key="'+key+'" data-part="0" aria-label="'+scheduleDays[day]+' fag" value="'+esc(parts[0]||"")+'"></div>'}
  h+="</div></td>"}h+="</tr>"}
  el("scheduleTable").innerHTML=h+"</tbody>";
  el("scheduleTable").querySelectorAll("input[data-key]").forEach(input=>input.addEventListener("input",()=>{const key=input.dataset.key,parts=(scheduleData[key]??scheduleTemplate[Number(key.split("-")[1])][Number(key.split("-")[0])][Number(key.split("-")[2])]).split("|");parts[Number(input.dataset.part)]=input.value;scheduleData[key]=parts.join("|");try{localStorage.setItem(scheduleKey,JSON.stringify(scheduleData))}catch{}}))
