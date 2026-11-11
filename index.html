@@ -282,10 +282,10 @@ addWidgetControls();
 
 
 const dunkScreen=el("dunkScreen"),dunkCanvas=el("dunkCanvas"),dctx=dunkCanvas.getContext("2d");
-let dunkY=205,dunkVy=0,dunkHoops=[],dunkScore=0,dunkBest=0,dunkState="ready",dunkFrame=0,dunkLast=0,dunkRaf=0,dunkNextX=255,dunkPointer=false,dunkWingBeat=0;
+let dunkY=205,dunkVy=0,dunkHoops=[],dunkScore=0,dunkBest=0,dunkState="ready",dunkFrame=0,dunkLast=0,dunkRaf=0,dunkNextX=255,dunkPointer=false,dunkWingBeat=0,dunkStreak=0,dunkParticles=[],dunkFlash=0;
 try{dunkBest=Number(localStorage.getItem("skoleboard-dunk-best-v1"))||0}catch{}
-function dunkReset(){dunkY=205;dunkVy=0;dunkHoops=[{x:260,y:265,passed:false,missed:false}];dunkNextX=260;dunkScore=0;dunkFrame=0;dunkWingBeat=0;dunkState="ready";dunkLast=0;dunkDraw()}
-function dunkFlap(){if(dunkScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;if(dunkState==="over")dunkReset();dunkState="playing";dunkVy=-5.3}
+function dunkReset(){dunkY=205;dunkVy=0;dunkHoops=[{x:260,y:265,passed:false,entered:false,touched:false}];dunkNextX=260;dunkScore=0;dunkFrame=0;dunkWingBeat=0;dunkStreak=0;dunkParticles=[];dunkFlash=0;dunkState="ready";dunkLast=0;dunkDraw()}
+function dunkFlap(){if(dunkScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden"))return;if(dunkState==="over")dunkReset();dunkState="playing";dunkVy=-5.3;dunkWingBeat+=1.3}
 function dunkDraw(){
  const g=dctx;g.clearRect(0,0,360,440);const grad=g.createLinearGradient(0,0,0,440);grad.addColorStop(0,"#a7e9ff");grad.addColorStop(1,"#e9f9ff");g.fillStyle=grad;g.fillRect(0,0,360,440);
  g.fillStyle="#ffffff77";for(let i=0;i<5;i++){let x=(i*115+35-dunkFrame*.3)%480;if(x< -50)x+=480;g.beginPath();g.ellipse(x,60+(i%3)*60,33,12,0,0,Math.PI*2);g.fill()}
@@ -295,39 +295,58 @@ function dunkDraw(){
   g.strokeStyle="#ffb36b";g.lineWidth=2;g.beginPath();g.moveTo(x-31,y-2);g.lineTo(x+31,y-2);g.stroke();
  }
  g.save();g.translate(83,dunkY);g.rotate(Math.max(-.45,Math.min(.7,dunkVy*.075)));
- // Animated feathered wings flap behind the ball.
- const wingAngle=Math.sin(dunkWingBeat)*.65;
- for(const side of [-1,1]){g.save();g.scale(side,1);g.translate(10,-2);g.rotate(wingAngle*side*.35);
- g.fillStyle="#fff";g.strokeStyle="#b9d5e7";g.lineWidth=1.5;
- g.beginPath();g.moveTo(0,2);g.quadraticCurveTo(15,-22-wingAngle*10,34,-20-wingAngle*14);g.quadraticCurveTo(29,-9-wingAngle*8,26,-6);g.quadraticCurveTo(21,-10,21,-1);g.quadraticCurveTo(15,-6,13,4);g.closePath();g.fill();g.stroke();
- g.strokeStyle="#d0e4f2";g.beginPath();g.moveTo(10,-3);g.lineTo(28,-15-wingAngle*10);g.moveTo(15,0);g.lineTo(24,-8-wingAngle*7);g.stroke();g.restore()}
+ // Short rounded Flappy Bird-style wings, flapping from the sides.
+ const flap=Math.sin(dunkWingBeat)*.8;
+ for(const side of [-1,1]){g.save();g.scale(side,1);g.translate(11,2);g.rotate(flap*.7);
+ g.fillStyle="#fffdf2";g.strokeStyle="#a9bccc";g.lineWidth=2;
+ g.beginPath();g.moveTo(-1,-3);g.quadraticCurveTo(12,-19,23,-11);g.quadraticCurveTo(33,-6,27,1);g.quadraticCurveTo(22,9,13,6);g.quadraticCurveTo(7,12,0,5);g.closePath();g.fill();g.stroke();
+ g.strokeStyle="#c5d7e3";g.lineWidth=1.5;g.beginPath();g.moveTo(9,1);g.quadraticCurveTo(18,-4,24,-3);g.stroke();g.restore()}
  g.fillStyle="#e97c23";g.strokeStyle="#65350e";g.lineWidth=2.5;g.beginPath();g.arc(0,0,15,0,Math.PI*2);g.fill();g.stroke();g.beginPath();g.moveTo(-15,0);g.lineTo(15,0);g.moveTo(0,-15);g.lineTo(0,15);g.moveTo(-11,-10);g.quadraticCurveTo(5,0,-11,10);g.moveTo(11,-10);g.quadraticCurveTo(-5,0,11,10);g.stroke();g.restore();
+ for(const p of dunkParticles){g.globalAlpha=Math.max(0,p.life/28);g.fillStyle=p.color;g.beginPath();g.arc(p.x,p.y,p.radius,0,Math.PI*2);g.fill()}g.globalAlpha=1;
+ if(dunkFlash>0){g.fillStyle="rgba(255,239,130,"+(dunkFlash/16*.22)+")";g.fillRect(0,0,360,440)}
+ if(dunkStreak>1){g.fillStyle="#b45309";g.font="bold 17px system-ui";g.textAlign="center";g.fillText("🔥 x"+Math.pow(2,dunkStreak-1)+" combo",180,71)}
  g.fillStyle="#154a76";g.textAlign="center";g.font="bold 29px system-ui";g.fillText(String(dunkScore),180,42);g.textAlign="right";g.font="bold 14px system-ui";g.fillText("🏆 "+dunkBest,347,27);
  if(dunkState!=="playing"){g.fillStyle="#082340bf";g.fillRect(35,155,290,112);g.fillStyle="#fff";g.textAlign="center";g.font="bold 25px system-ui";g.fillText(dunkState==="over"?"Game over!":"🏀 Flappy Dunk",180,197);g.font="15px system-ui";g.fillText(dunkState==="over"?"Tryk for at prøve igen":"Tryk for at hoppe gennem kurvene",180,228)}
 }
-function dunkLoop(t){dunkRaf=requestAnimationFrame(dunkLoop);if(dunkScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden")){dunkLast=t;return}const dt=Math.min(2.2,(t-(dunkLast||t))/16.67||1);dunkLast=t;
- if(dunkState==="playing"){dunkFrame+=dt;dunkWingBeat+=dt*.35;const prevY=dunkY;dunkVy+=.32*dt;dunkY+=dunkVy*dt;
- const speed=(2.05+Math.min(1.5,dunkScore*.08))*dt;
- for(const h of dunkHoops){const prevX=h.x;h.x-=speed;
- // Count only a clean downward pass through the opening of the hoop.
- if(!h.passed&&dunkVy>0&&prevY+15<=h.y&&dunkY+15>=h.y&&Math.abs(h.x-83)<24){h.passed=true;dunkScore++;if(dunkScore>dunkBest){dunkBest=dunkScore;try{localStorage.setItem("skoleboard-dunk-best-v1",String(dunkBest))}catch{}}}
- if(!h.passed&&h.x+34<65)dunkState="over";
- // The ball can land on either side of the rim and bounce off it.
- const rimLeft=h.x-32,rimRight=h.x+32;
- for(const rimX of [rimLeft,rimRight]){
-  const dx=83-rimX,dy=dunkY-h.y,dist=Math.hypot(dx,dy),minimum=18.5;
-  if(dist<minimum&&dist>0){
-   const nx=dx/dist,ny=dy/dist;
-   dunkY+=(minimum-dist)*ny;
-   if(dunkVy*ny<0)dunkVy-=1.65*dunkVy*ny*ny;
-   if(ny<-.25&&dunkVy>0)dunkVy=-Math.max(2.2,dunkVy*.55);
+function dunkBurst(x,y,clean){for(let i=0;i<18;i++){const a=Math.PI*2*i/18;const speed=1.5+Math.random()*3;dunkParticles.push({x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed-1,life:28,radius:2+Math.random()*3,color:clean?"#ffd447":"#ffffff"})}dunkFlash=16}
+function dunkLoop(t){
+ dunkRaf=requestAnimationFrame(dunkLoop);
+ if(dunkScreen.classList.contains("hidden")||gamesModal.classList.contains("hidden")){dunkLast=t;return}
+ const dt=Math.min(2.2,(t-(dunkLast||t))/16.67||1);dunkLast=t;
+ dunkWingBeat+=dt*(dunkState==="playing"?.4:.12);
+ dunkParticles=dunkParticles.filter(p=>p.life>0);
+ for(const p of dunkParticles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.1*dt;p.life-=dt}
+ dunkFlash=Math.max(0,dunkFlash-dt);
+ if(dunkState==="playing"){
+  dunkFrame+=dt;const prevY=dunkY;
+  dunkVy+=.32*dt;dunkY+=dunkVy*dt;
+  const speed=(2.05+Math.min(1.5,dunkScore*.035))*dt;
+  for(const h of dunkHoops){
+   h.x-=speed;
+   // Rim contact breaks the clean-shot streak but does not bounce the ball.
+   for(const rx of [h.x-32,h.x+32]){
+    if(Math.hypot(83-rx,dunkY-h.y)<18.5){h.touched=true;dunkStreak=0}
+   }
+   // Score only after the ball has fully crossed BELOW the hoop's rim.
+   // Require that the ball first entered the hoop from above.
+   if(!h.entered&&dunkVy>0&&prevY+15<=h.y&&dunkY+15>=h.y&&Math.abs(h.x-83)<22)h.entered=true;
+   if(h.entered&&!h.passed&&dunkVy>0&&prevY-15<=h.y+27&&dunkY-15>=h.y+27&&Math.abs(h.x-83)<22){
+    h.passed=true;
+    dunkStreak=h.touched?0:dunkStreak+1;
+    const points=h.touched?1:Math.pow(2,Math.min(12,dunkStreak-1));
+    dunkScore+=points;dunkBurst(83,h.y+22,!h.touched);
+    if(dunkScore>dunkBest){dunkBest=dunkScore;try{localStorage.setItem("skoleboard-dunk-best-v1",String(dunkBest))}catch{}}
+   }
+   if(!h.passed&&h.x+34<65)dunkState="over";
   }
+  if(dunkHoops.length&&dunkHoops[dunkHoops.length-1].x<185){
+   const last=dunkHoops[dunkHoops.length-1];dunkHoops.push({x:last.x+225,y:145+Math.random()*175,passed:false,entered:false,touched:false})
+  }
+  dunkHoops=dunkHoops.filter(h=>h.x>-75);
+  if(dunkY<15||dunkY>425){if(dunkY>425)dunkBurst(83,420,false);dunkState="over";dunkStreak=0}
  }
- }
- if(dunkHoops.length&&dunkHoops[dunkHoops.length-1].x<185){const last=dunkHoops[dunkHoops.length-1];dunkHoops.push({x:last.x+225,y:145+Math.random()*175,passed:false})}
- dunkHoops=dunkHoops.filter(h=>h.x> -75);if(dunkY<15||dunkY>425)dunkState="over";
- }
- dunkDraw()}
+ dunkDraw()
+}
 function dunkStart(){dunkReset();if(!dunkRaf)dunkRaf=requestAnimationFrame(dunkLoop)}
 el("playDunk").onclick=()=>{gameMenu.classList.add("hidden");flappyScreen.classList.add("hidden");dashScreen.classList.add("hidden");snakeScreen.classList.add("hidden");dunkScreen.classList.remove("hidden");snakeStop();dunkStart()};
 el("dunkBack").onclick=()=>{dunkScreen.classList.add("hidden");gameMenu.classList.remove("hidden");dunkState="ready"};
