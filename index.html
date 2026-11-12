@@ -148,6 +148,22 @@ body{transition:background-color .65s ease,color .45s ease}
 #wheelOptions{width:100%;min-height:110px;background:#081d38;color:#fff;border:1px solid #39618a;border-radius:10px;padding:12px;font:inherit;resize:vertical}
 #wheelResult{text-align:center;min-height:28px;font-size:19px;font-weight:700;color:#f4d27a}
 @media(prefers-reduced-motion:reduce){body,.panel,.linkcard,.gamesWindow,.control-window,.primary,.ghost,.theme-option,#schedule,#schedule .schedule-table th,#schedule .schedule-table td,#schedule .lesson-box{transition:none!important}}
+
+/* Virtuelt grisekæledyr */
+#pigPet .pig-layout{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+#pigPet .pig-stage{width:190px;min-height:172px;display:grid;place-items:center;border-radius:22px;background:radial-gradient(circle at 50% 90%,#5b9a72 0%,#265b53 55%,#173a4b 100%);border:1px solid #70b3a566;position:relative;overflow:hidden}
+#pigPet .pig-face{font-size:94px;line-height:1;filter:drop-shadow(0 8px 8px #091e2780);display:block;transform-origin:50% 90%;animation:pig-bob 2.4s ease-in-out infinite}
+#pigPet .pig-face.pig-happy{animation:pig-hop .5s ease-in-out 2}
+#pigPet .pig-info{flex:1;min-width:210px}
+#pigPet .pig-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+#pigPet .pig-actions button{padding:9px 13px}
+#pigPet .pig-meter{height:11px;background:#071b2b;border-radius:99px;overflow:hidden;margin:6px 0 12px;border:1px solid #ffffff24}
+#pigPet .pig-meter>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ed8fa6,#ffc0cb);transition:width .35s ease}
+#pigPet #pigFunBar{background:linear-gradient(90deg,#8b8fff,#a8d6ff)}
+#pigPet #pigMood{min-height:23px}
+@keyframes pig-bob{50%{transform:translateY(-6px) rotate(2deg)}}
+@keyframes pig-hop{50%{transform:translateY(-19px) rotate(-8deg)}}
+@media(prefers-reduced-motion:reduce){#pigPet .pig-face,#pigPet .pig-face.pig-happy{animation:none}}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
@@ -161,6 +177,7 @@ body{transition:background-color .65s ease,color .45s ease}
  <div class="panel widget" data-widget="holiday"><div class="widget-handle">⠿ Flyt nedtælling <span class="widget-move"></span></div><h3>🏖️ Nedtælling til ferie</h3><p id="holidayName" style="font-weight:700;margin:8px 0"></p><p id="holidayCountdown" class="muted" aria-live="off" style="font-size:clamp(24px,3vw,36px);font-weight:800;line-height:1.25;margin:16px 0;color:#eaf5ff">Nedtællingen indlæses...</p><details><summary style="cursor:pointer;color:#a9c1dd">Se alle kommende ferier</summary><div id="holidayList" class="muted" style="font-size:13px;line-height:1.8;margin-top:8px"></div></details></div>
  <div class="panel widget" data-widget="theme"><div class="widget-handle">⠿ Flyt temaer <span class="widget-move"></span></div><h3>🎨 Tema og baggrund</h3><label for="themeChoice">Farvetema</label><div id="themePicker" class="theme-picker" role="group" aria-label="Vælg farvetema"><button type="button" class="theme-option" data-theme-option="blue" aria-pressed="false"><span class="theme-swatch" style="background:#2777e8"></span>Blå</button><button type="button" class="theme-option" data-theme-option="purple" aria-pressed="false"><span class="theme-swatch" style="background:#8747df"></span>Lilla</button><button type="button" class="theme-option" data-theme-option="green" aria-pressed="false"><span class="theme-swatch" style="background:#168d79"></span>Grøn</button><button type="button" class="theme-option" data-theme-option="dark" aria-pressed="false"><span class="theme-swatch" style="background:#353f57"></span>Mørk</button><button type="button" class="theme-option" data-theme-option="pink" aria-pressed="false"><span class="theme-swatch" style="background:#d34b96"></span>Lyserød</button><button type="button" class="theme-option" data-theme-option="red" aria-pressed="false"><span class="theme-swatch" style="background:#d84b55"></span>Rød</button><button type="button" class="theme-option" data-theme-option="orange" aria-pressed="false"><span class="theme-swatch" style="background:#e17c31"></span>Orange</button><button type="button" class="theme-option" data-theme-option="cyan" aria-pressed="false"><span class="theme-swatch" style="background:#009fb5"></span>Turkis</button><button type="button" class="theme-option" data-theme-option="midnight" aria-pressed="false"><span class="theme-swatch" style="background:#465cbd"></span>Midnatsblå</button><button type="button" class="theme-option" data-theme-option="forest" aria-pressed="false"><span class="theme-swatch" style="background:#3c9860"></span>Skovgrøn</button><button type="button" class="theme-option" data-theme-option="sunset" aria-pressed="false"><span class="theme-swatch" style="background:#e46682"></span>Solnedgang</button><button type="button" class="theme-option" data-theme-option="gold" aria-pressed="false"><span class="theme-swatch" style="background:#bb8b26"></span>Guld</button><button type="button" class="theme-option" data-theme-option="christmas" aria-pressed="false"><span class="theme-swatch" style="background:linear-gradient(135deg,#b72d3d 50%,#1c754c 50%);border-color:#e6c66d"></span>🎄 Jul</button><button type="button" class="theme-option" data-theme-option="halloween" aria-pressed="false"><span class="theme-swatch" style="background:linear-gradient(135deg,#e77b24 50%,#342847 50%);border-color:#ffcb74"></span>🎃 Halloween</button></div><label>Animeret baggrund</label><div class="animated-bg-options" id="animatedBgOptions" role="group" aria-label="Vælg animeret baggrund"><button type="button" data-animated-bg="none">Fra</button><button type="button" data-animated-bg="snow">❄️ Sne</button><button type="button" data-animated-bg="rain">🌧️ Regn</button><button type="button" data-animated-bg="stars">✨ Stjerner</button><button type="button" data-animated-bg="bubbles">🫧 Flydende farver</button></div><p class="muted" style="font-size:12px">Effekten vises oven på din valgte farve eller dit baggrundsbillede. Valget gemmes automatisk.</p><label for="bgColor">Baggrundsfarve</label><div id="bgPresets" class="bg-presets" role="group" aria-label="Baggrundsfarver"></div><div class="bg-color-row"><input id="bgColor" type="color" value="#07152c" aria-label="Vælg baggrundsfarve"><button id="resetBgColor" class="ghost" type="button">Nulstil farve</button></div><label for="bgUpload">Eget baggrundsbillede</label><input id="bgUpload" type="file" accept="image/*"><button class="ghost" type="button" id="removeBg">Fjern baggrund</button><p class="muted" style="font-size:12px">Billedet gemmes kun i din browser.</p></div>
 </div>
+<section id="pigPet" class="panel widget" data-widget="pig"><div class="widget-handle">⠿ Flyt kæledyr <span class="widget-move"></span></div><h2>🐷 Mit lille kæledyr</h2><div class="pig-layout"><div class="pig-stage"><span id="pigFace" class="pig-face" role="img" aria-label="En glad lille gris">🐷</span></div><div class="pig-info"><label for="pigName">Din gris hedder</label><input id="pigName" maxlength="24" value="Nuller" aria-label="Grisens navn"><div><small>🍎 Mæthed</small><div class="pig-meter"><span id="pigFoodBar" style="width:75%"></span></div><small>🎾 Glæde</small><div class="pig-meter"><span id="pigFunBar" style="width:75%"></span></div></div><p id="pigMood" class="muted" role="status" aria-live="polite">Øf øf! 🐽</p><div class="pig-actions"><button id="pigFeed" class="primary" type="button">🍎 Giv mad</button><button id="pigPlay" class="ghost" type="button">🎾 Leg</button><button id="pigRest" class="ghost" type="button">💤 Hvil</button></div></div></div></section>
 <section id="schedule" class="panel widget" data-widget="schedule"><div class="widget-handle">⠿ Flyt skoleskema <span class="widget-move"></span></div><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">📅 Mit skoleskema</h2></div><div class="school-status"><div><span>⏳ Næste time</span><strong id="nextLesson">Indlæser…</strong><small id="nextLessonCountdown"></small></div><div><span>📊 Skoledagen</span><strong id="schoolProgressLabel">0 %</strong><div class="school-progress-track"><div id="schoolProgressFill"></div></div></div></div><p class="muted">Rediger fag direkte i skemaet.</p><div class="schedule-scroll"><table id="scheduleTable" class="schedule-table" aria-label="Mit skoleskema"></table></div></section></div>
 
 </main>
@@ -570,7 +587,7 @@ document.addEventListener("keydown",e=>{if(arcadeMode!=="dino"||gamesModal.class
 document.addEventListener("keyup",e=>{if(e.code==="ArrowDown")dinoDown=false});
 
 
-const backupKeys=["skolehub-links-v1","skoleboard-schedule-clean-v5","skoleboard-theme","skoleboard-bg-color","skoleboard-background","skoleboard-animated-background-v1","skoleboard-widget-order-v1","skoleboard-hidden-widgets-v1","skoleboard-flappy-best-v1","skoleboard-snake-best-v1","skoleboard-dino-best-v1","skoleboard-wheel-options-v1"];
+const backupKeys=["skolehub-links-v1","skoleboard-schedule-clean-v5","skoleboard-theme","skoleboard-bg-color","skoleboard-background","skoleboard-animated-background-v1","skoleboard-widget-order-v1","skoleboard-hidden-widgets-v1","skoleboard-flappy-best-v1","skoleboard-snake-best-v1","skoleboard-dino-best-v1","skoleboard-wheel-options-v1","skoleboard-pig-pet-v1"];
 function backupStatus(message){el("backupStatus").textContent=message}
 el("exportSettings").onclick=()=>{
  try{
@@ -647,8 +664,37 @@ el("spinWheel").onclick=()=>{
 };
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!wheelModal.classList.contains("hidden"))closeWheel()});
 
+
+/* Grisens navn og trivsel gemmes lokalt på enheden. */
+const pigStorageKey="skoleboard-pig-pet-v1";
+let pigState={name:"Nuller",food:75,fun:75,last:Date.now()};
+try{const stored=JSON.parse(localStorage.getItem(pigStorageKey)||"null");if(stored&&typeof stored==="object"){
+ pigState.name=typeof stored.name==="string"?stored.name.slice(0,24):"Nuller";
+ pigState.food=Number.isFinite(stored.food)?Math.max(0,Math.min(100,stored.food)):75;
+ pigState.fun=Number.isFinite(stored.fun)?Math.max(0,Math.min(100,stored.fun)):75;
+ pigState.last=Number.isFinite(stored.last)?stored.last:Date.now();
+}}catch{}
+const pigElapsed=Math.max(0,Math.min(24,(Date.now()-pigState.last)/3600000));
+pigState.food=Math.max(15,pigState.food-pigElapsed*2);
+pigState.fun=Math.max(15,pigState.fun-pigElapsed*1.5);
+pigState.last=Date.now();
+function pigSave(){pigState.last=Date.now();try{localStorage.setItem(pigStorageKey,JSON.stringify(pigState))}catch{}}
+function pigRender(message){
+ el("pigName").value=pigState.name;
+ el("pigFoodBar").style.width=pigState.food+"%";el("pigFunBar").style.width=pigState.fun+"%";
+ const happy=pigState.food>=40&&pigState.fun>=40;
+ el("pigFace").textContent=happy?"🐷":"🐽";
+ el("pigFace").setAttribute("aria-label",happy?"En glad gris":"En gris der gerne vil have opmærksomhed");
+ el("pigMood").textContent=message||(happy?"Øf øf! Jeg har det dejligt! 🐽":"Jeg vil gerne have lidt mad eller lege! 🐷");
+}
+function pigCelebrate(){const face=el("pigFace");face.classList.remove("pig-happy");void face.offsetWidth;face.classList.add("pig-happy")}
+el("pigName").addEventListener("input",e=>{pigState.name=e.target.value.slice(0,24);pigSave()});
+el("pigFeed").addEventListener("click",()=>{pigState.food=Math.min(100,pigState.food+20);pigSave();pigRender("Mums! Tak for maden! 🍎");pigCelebrate()});
+el("pigPlay").addEventListener("click",()=>{pigState.fun=Math.min(100,pigState.fun+22);pigState.food=Math.max(15,pigState.food-4);pigSave();pigRender("Jubii! Det var sjovt! 🎾");pigCelebrate()});
+el("pigRest").addEventListener("click",()=>{pigState.fun=Math.min(100,pigState.fun+10);pigSave();pigRender("Zzz... Dejlig lur! 💤");pigCelebrate()});
+pigRender();pigSave();
 const controlPanel=el("controlPanel"),controlToggle=el("controlToggle");
-const controlWidgetNames={links:"🔗 Links",search:"🔎 Google-søgning",holiday:"🏖️ Ferie",theme:"🎨 Tema",schedule:"📅 Skoleskema"};
+const controlWidgetNames={links:"🔗 Links",search:"🔎 Google-søgning",holiday:"🏖️ Ferie",theme:"🎨 Tema",schedule:"📅 Skoleskema",pig:"🐷 Kæledyr"};
 const controlVisibilityKey="skoleboard-hidden-widgets-v1";
 let hiddenWidgets=[];try{const stored=JSON.parse(localStorage.getItem(controlVisibilityKey)||"[]");if(Array.isArray(stored))hiddenWidgets=stored.filter(x=>Object.hasOwn(controlWidgetNames,x))}catch{}
 function applyWidgetVisibility(){
