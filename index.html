@@ -164,6 +164,18 @@ body{transition:background-color .65s ease,color .45s ease}
 @keyframes pig-bob{50%{transform:translateY(-6px) rotate(2deg)}}
 @keyframes pig-hop{50%{transform:translateY(-19px) rotate(-8deg)}}
 @media(prefers-reduced-motion:reduce){#pigPet .pig-face,#pigPet .pig-face.pig-happy{animation:none}}
+
+/* Lommeregner */
+#calculatorModal{position:fixed;inset:0;z-index:10020;background:#030c1cbb;display:grid;place-items:center;padding:18px}
+#calculatorModal.hidden{display:none}
+.calc-window{width:min(100%,370px);padding:22px;border-radius:20px;background:var(--panel,#10294c);border:1px solid var(--accent,#397cbe);box-shadow:0 20px 70px #0008}
+.calc-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.calc-head h2{margin:0}
+#calcDisplay{width:100%;font-size:31px;text-align:right;font-variant-numeric:tabular-nums;padding:17px 12px;margin:0 0 12px;background:#061527;color:#fff;border:1px solid #6583a0;border-radius:12px}
+.calc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.calc-grid button{min-height:54px;border:1px solid #ffffff22;border-radius:12px;background:var(--card,#203d65);color:#fff;font-size:21px;font-weight:600}
+.calc-grid button[data-calc="="]{background:var(--accent,#2777e8)}
+.calc-grid button[data-calc="C"],.calc-grid button[data-calc="back"]{background:#6d3544}
+.calc-grid button:focus-visible{outline:3px solid #ffe59c;outline-offset:2px}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
@@ -183,8 +195,9 @@ body{transition:background-color .65s ease,color .45s ease}
 </main>
 
 <button id="controlToggle" type="button" class="primary">⚙️ Kontrolpanel</button>
-<div id="controlPanel" class="hidden" role="dialog" aria-modal="true" aria-label="Rediger SkoleBoard"><div class="control-window"><div class="control-head"><h2>⚙️ Kontrolpanel</h2><button id="closeControl" class="ghost" type="button">✕</button></div><p class="control-note">Tilpas SkoleBoard direkte, uden ChatGPT.</p><div class="control-actions"><button id="controlAddLink" class="primary" type="button">＋ Tilføj link</button><button id="controlEditSchedule" class="ghost" type="button">📅 Rediger skema</button><button id="controlTheme" class="ghost" type="button">🎨 Farver og baggrund</button><button id="controlReorder" class="ghost" type="button">↕️ Flyt bokse</button><button id="openWheel" class="ghost" type="button">🎡 Lykkehjul</button></div><h3>💾 Backup af indstillinger</h3><p class="control-note">Gem dine links, skema, tema, baggrund, widgets og spilrekorder i en fil. Importér filen for at gendanne indstillingerne, også på en anden enhed.</p><div class="control-actions"><button id="exportSettings" class="primary" type="button">⬇️ Download backup</button><button id="importSettings" class="ghost" type="button">⬆️ Importér backup</button><input id="importSettingsFile" type="file" accept=".json,application/json" hidden></div><p id="backupStatus" class="control-note" role="status" aria-live="polite"></p><h3>Vis eller skjul bokse</h3><div id="controlVisibility" class="control-visibility"></div><p class="control-note">Dine ændringer gemmes i denne browser. De ændrer ikke hjemmesiden for andre eller på dine andre enheder.</p></div></div>
+<div id="controlPanel" class="hidden" role="dialog" aria-modal="true" aria-label="Rediger SkoleBoard"><div class="control-window"><div class="control-head"><h2>⚙️ Kontrolpanel</h2><button id="closeControl" class="ghost" type="button">✕</button></div><p class="control-note">Tilpas SkoleBoard direkte, uden ChatGPT.</p><div class="control-actions"><button id="controlAddLink" class="primary" type="button">＋ Tilføj link</button><button id="controlEditSchedule" class="ghost" type="button">📅 Rediger skema</button><button id="controlTheme" class="ghost" type="button">🎨 Farver og baggrund</button><button id="controlReorder" class="ghost" type="button">↕️ Flyt bokse</button><button id="openWheel" class="ghost" type="button">🎡 Lykkehjul</button><button id="openCalculator" class="ghost" type="button">🧮 Lommeregner</button></div><h3>💾 Backup af indstillinger</h3><p class="control-note">Gem dine links, skema, tema, baggrund, widgets og spilrekorder i en fil. Importér filen for at gendanne indstillingerne, også på en anden enhed.</p><div class="control-actions"><button id="exportSettings" class="primary" type="button">⬇️ Download backup</button><button id="importSettings" class="ghost" type="button">⬆️ Importér backup</button><input id="importSettingsFile" type="file" accept=".json,application/json" hidden></div><p id="backupStatus" class="control-note" role="status" aria-live="polite"></p><h3>Vis eller skjul bokse</h3><div id="controlVisibility" class="control-visibility"></div><p class="control-note">Dine ændringer gemmes i denne browser. De ændrer ikke hjemmesiden for andre eller på dine andre enheder.</p></div></div>
 <button id="fullscreenToggle" type="button" class="ghost" title="Fuldskærm" aria-label="Slå fuldskærm til eller fra">⛶ Fuldskærm</button>
+<div id="calculatorModal" class="hidden" role="dialog" aria-modal="true" aria-label="Lommeregner"><div class="calc-window"><div class="calc-head"><h2>🧮 Lommeregner</h2><button id="closeCalculator" class="ghost" type="button" aria-label="Luk lommeregner">✕</button></div><input id="calcDisplay" aria-label="Resultat" value="0" readonly><div class="calc-grid" id="calcKeys"><button data-calc="C">C</button><button data-calc="back" aria-label="Slet sidste tal">⌫</button><button data-calc="%">%</button><button data-calc="/">÷</button><button data-calc="7">7</button><button data-calc="8">8</button><button data-calc="9">9</button><button data-calc="*">×</button><button data-calc="4">4</button><button data-calc="5">5</button><button data-calc="6">6</button><button data-calc="-">−</button><button data-calc="1">1</button><button data-calc="2">2</button><button data-calc="3">3</button><button data-calc="+">+</button><button data-calc="±">±</button><button data-calc="0">0</button><button data-calc=".">,</button><button data-calc="=">=</button></div><p class="muted" style="font-size:12px;margin-bottom:0">Du kan også bruge tastaturet.</p></div></div>
 <div id="wheelModal" class="hidden" role="dialog" aria-modal="true" aria-label="Lykkehjul"><div class="wheel-window"><div class="wheel-head"><h2>🎡 Lykkehjul</h2><button id="closeWheel" class="ghost" type="button" aria-label="Luk lykkehjul">✕</button></div><p class="muted">Skriv én mulighed på hver linje.</p><textarea id="wheelOptions" spellcheck="false" maxlength="2000">Matematik\nDansk\nEngelsk\nPause</textarea><canvas id="wheelCanvas" width="360" height="360" aria-label="Lykkehjul med dine muligheder"></canvas><p id="wheelResult" role="status" aria-live="polite">Klar til at dreje!</p><button id="spinWheel" class="primary" type="button">🎡 Drej hjulet</button></div></div><button id="gamesToggle" type="button" aria-label="Åbn spil">🎮 Spil</button>
 <div id="gamesModal" class="hidden" role="dialog" aria-modal="true" aria-label="Spil">
  <div class="gamesWindow">
@@ -693,6 +706,35 @@ el("pigFeed").addEventListener("click",()=>{pigState.food=Math.min(100,pigState.
 el("pigPlay").addEventListener("click",()=>{pigState.fun=Math.min(100,pigState.fun+22);pigState.food=Math.max(15,pigState.food-4);pigSave();pigRender("Jubii! Det var sjovt! 🎾");pigCelebrate()});
 el("pigRest").addEventListener("click",()=>{pigState.fun=Math.min(100,pigState.fun+10);pigSave();pigRender("Zzz... Dejlig lur! 💤");pigCelebrate()});
 pigRender();pigSave();
+
+/* Lommeregner: beregner kun via tal og valgte operatorer (ingen eval). */
+const calcModal=el("calculatorModal"),calcDisplay=el("calcDisplay");
+let calcCurrent="0",calcPrevious=null,calcOperator=null,calcNewNumber=false;
+function calcShow(){calcDisplay.value=calcCurrent.replace(".",",")}
+function calcFormat(value){if(!Number.isFinite(value))return "Fejl";return String(Number(value.toPrecision(12)))}
+function calcCompute(){if(calcPrevious===null||!calcOperator)return true;const a=calcPrevious,b=Number(calcCurrent);let result;
+ switch(calcOperator){case "+":result=a+b;break;case "-":result=a-b;break;case "*":result=a*b;break;case "/":result=b===0?NaN:a/b;break;default:return false}
+ calcCurrent=calcFormat(result);calcPrevious=null;calcOperator=null;calcNewNumber=true;return calcCurrent!=="Fejl"}
+function calcPress(key){
+ if(key==="C"){calcCurrent="0";calcPrevious=null;calcOperator=null;calcNewNumber=false}
+ else if(key==="back"){if(calcNewNumber||calcCurrent==="Fejl"){calcCurrent="0";calcNewNumber=false}else calcCurrent=calcCurrent.length<=1||calcCurrent.length===2&&calcCurrent[0]==="-"?"0":calcCurrent.slice(0,-1)}
+ else if(/^\\d$/.test(key)){if(calcCurrent==="Fejl"||calcNewNumber){calcCurrent=key;calcNewNumber=false}else if(calcCurrent.replace(/[-.]/g,"").length<14)calcCurrent=calcCurrent==="0"?key:calcCurrent+key}
+ else if(key==="."){if(calcCurrent==="Fejl"||calcNewNumber){calcCurrent="0.";calcNewNumber=false}else if(!calcCurrent.includes("."))calcCurrent+="."}
+ else if(key==="±"){if(calcCurrent!=="Fejl"&&Number(calcCurrent)!==0)calcCurrent=calcCurrent.startsWith("-")?calcCurrent.slice(1):"-"+calcCurrent}
+ else if(key==="%"){if(calcCurrent!=="Fejl")calcCurrent=calcFormat(Number(calcCurrent)/100)}
+ else if(["+","-","*","/"].includes(key)){if(calcCurrent==="Fejl")return;if(calcOperator&&!calcNewNumber&&!calcCompute()){calcShow();return}calcPrevious=Number(calcCurrent);calcOperator=key;calcNewNumber=true}
+ else if(key==="="){if(calcOperator&&!calcNewNumber)calcCompute()}
+ calcShow();
+}
+el("openCalculator").addEventListener("click",()=>{calcModal.classList.remove("hidden");el("closeCalculator").focus()});
+el("closeCalculator").addEventListener("click",()=>calcModal.classList.add("hidden"));
+calcModal.addEventListener("click",e=>{if(e.target===calcModal)calcModal.classList.add("hidden")});
+el("calcKeys").addEventListener("click",e=>{const button=e.target.closest("button[data-calc]");if(button)calcPress(button.dataset.calc)});
+document.addEventListener("keydown",e=>{if(calcModal.classList.contains("hidden"))return;
+ if(e.key==="Escape"){calcModal.classList.add("hidden");return}
+ const key=e.key==="Enter"?"=":e.key==="Backspace"?"back":e.key==="Delete"?"C":e.key===","?".":e.key;
+ if(/^[0-9]$/.test(key)||[".","+","-","*","/","%","=","back","C"].includes(key)){e.preventDefault();calcPress(key)}
+});
 const controlPanel=el("controlPanel"),controlToggle=el("controlToggle");
 const controlWidgetNames={links:"🔗 Links",search:"🔎 Google-søgning",holiday:"🏖️ Ferie",theme:"🎨 Tema",schedule:"📅 Skoleskema",pig:"🐷 Kæledyr"};
 const controlVisibilityKey="skoleboard-hidden-widgets-v1";
