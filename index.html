@@ -718,7 +718,7 @@ function calcCompute(){if(calcPrevious===null||!calcOperator)return true;const a
 function calcPress(key){
  if(key==="C"){calcCurrent="0";calcPrevious=null;calcOperator=null;calcNewNumber=false}
  else if(key==="back"){if(calcNewNumber||calcCurrent==="Fejl"){calcCurrent="0";calcNewNumber=false}else calcCurrent=calcCurrent.length<=1||calcCurrent.length===2&&calcCurrent[0]==="-"?"0":calcCurrent.slice(0,-1)}
- else if(/^\\d$/.test(key)){if(calcCurrent==="Fejl"||calcNewNumber){calcCurrent=key;calcNewNumber=false}else if(calcCurrent.replace(/[-.]/g,"").length<14)calcCurrent=calcCurrent==="0"?key:calcCurrent+key}
+ else if(/^[0-9]$/.test(key)){if(calcCurrent==="Fejl"||calcNewNumber){calcCurrent=key;calcNewNumber=false}else if(calcCurrent.replace(/[-.]/g,"").length<14)calcCurrent=calcCurrent==="0"?key:calcCurrent+key}
  else if(key==="."){if(calcCurrent==="Fejl"||calcNewNumber){calcCurrent="0.";calcNewNumber=false}else if(!calcCurrent.includes("."))calcCurrent+="."}
  else if(key==="±"){if(calcCurrent!=="Fejl"&&Number(calcCurrent)!==0)calcCurrent=calcCurrent.startsWith("-")?calcCurrent.slice(1):"-"+calcCurrent}
  else if(key==="%"){if(calcCurrent!=="Fejl")calcCurrent=calcFormat(Number(calcCurrent)/100)}
