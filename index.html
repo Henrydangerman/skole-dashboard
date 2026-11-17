@@ -181,6 +181,8 @@ body{transition:background-color .65s ease,color .45s ease}
 #geometryScreen{text-align:center}#geometryScreen .gameHint{margin:10px 0}
 
 .geo-level-picker{display:flex;flex-direction:column;align-items:center;gap:5px;margin:10px auto}.geo-level-picker label{font-weight:700}.geo-level-picker select{width:min(100%,340px);padding:11px;border-radius:10px;background:#092d42;color:white;border:1px solid #4be7ec;font:inherit}.geo-level-picker p{margin:4px 0}
+
+.geo-extra-controls{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin:7px 0}.geo-extra-controls label{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}.geo-extra-controls input{width:auto;margin:0;accent-color:#35e5ed}
 </style>
 <!-- Trigger GitHub Pages redeployment; keep existing dashboard and game unchanged. -->
 </head>
@@ -212,7 +214,7 @@ body{transition:background-color .65s ease,color .45s ease}
   
   
   <div id="snakeScreen" class="hidden"><canvas id="snakeCanvas" width="320" height="320" aria-label="Snake spil"></canvas><p class="gameHint">Brug piletasterne eller WASD. På mobil: swipe for at styre.</p><p id="snakeRecord" class="gameHint">🏆 Rekord: 0</p><button id="snakeRestart" class="primary" type="button">Start forfra</button> <button id="snakeBack" class="ghost" type="button">← Tilbage til spil</button></div>
- <div id="pongScreen" class="hidden"><canvas id="pongCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt musen eller fingeren for at styre battet. Først til 5 vinder!</p><button id="pongRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="breakoutScreen" class="hidden"><canvas id="breakoutCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt battet med musen eller fingeren, og slå alle klodserne væk.</p><button id="breakoutRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="geometryScreen" class="hidden"><div class="geo-level-picker"><label for="geometryLevel">🎮 Vælg bane</label><select id="geometryLevel"><option value="easy">🟢 Easy – First Steps</option><option value="normal">🔵 Normal – Neon Run</option><option value="hard">🟠 Hard – Spike Rush</option><option value="insane">🔴 Insane – Final Challenge</option></select><p id="geometryLevelInfo" class="gameHint">4 forskellige baner med stigende sværhedsgrad.</p></div><canvas id="geometryCanvas" width="760" height="340" aria-label="Geometry Dash-inspireret platformspil"></canvas><p class="gameHint">Hold mellemrum, ↑, W eller fingeren nede for gentagne hop. Slip for at stoppe. Undgå pigge og blokke!</p><p id="geometryStatus" class="gameHint" role="status" aria-live="polite">Klar til at spille</p><button id="geometryRestart" class="primary" type="button">↻ Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="dinoScreen" class="hidden"><canvas id="dinoCanvas" width="600" height="220" aria-label="Dinosaur løbespil"></canvas><p class="gameHint">Mellemrum / ↑ = hop · ↓ = duk dig · klik eller tryk = hop.</p><p class="gameHint" id="dinoRecord"></p><button id="dinoRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="ticScreen" class="hidden"><p class="gameHint" id="ticStatus">Din tur: ❌</p><div id="ticGrid" class="tic-grid"></div><button id="ticRestart" class="primary">Nyt spil</button> <button class="ghost" data-game-back>← Tilbage</button></div></div>
+ <div id="pongScreen" class="hidden"><canvas id="pongCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt musen eller fingeren for at styre battet. Først til 5 vinder!</p><button id="pongRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="breakoutScreen" class="hidden"><canvas id="breakoutCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt battet med musen eller fingeren, og slå alle klodserne væk.</p><button id="breakoutRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="geometryScreen" class="hidden"><div class="geo-level-picker"><label for="geometryLevel">🎮 Vælg bane</label><select id="geometryLevel"><option value="easy">🟢 Easy – First Steps</option><option value="normal">🔵 Normal – Neon Run</option><option value="hard">🟠 Hard – Spike Rush</option><option value="insane">🔴 Insane – Final Challenge</option></select><div class="geo-extra-controls"><label><input id="geometryPractice" type="checkbox"> 🏁 Practice mode (checkpoints)</label><label><input id="geometrySound" type="checkbox"> 🔊 Lydeffekter</label></div><p id="geometryLevelInfo" class="gameHint">4 forskellige baner med stigende sværhedsgrad.</p></div><canvas id="geometryCanvas" width="760" height="340" aria-label="Geometry Dash-inspireret platformspil"></canvas><p class="gameHint">Hold mellemrum, ↑, W eller fingeren nede for gentagne hop. Slip for at stoppe. Undgå pigge og blokke!</p><p id="geometryStatus" class="gameHint" role="status" aria-live="polite">Klar til at spille</p><button id="geometryRestart" class="primary" type="button">↻ Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="dinoScreen" class="hidden"><canvas id="dinoCanvas" width="600" height="220" aria-label="Dinosaur løbespil"></canvas><p class="gameHint">Mellemrum / ↑ = hop · ↓ = duk dig · klik eller tryk = hop.</p><p class="gameHint" id="dinoRecord"></p><button id="dinoRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="ticScreen" class="hidden"><p class="gameHint" id="ticStatus">Din tur: ❌</p><div id="ticGrid" class="tic-grid"></div><button id="ticRestart" class="primary">Nyt spil</button> <button class="ghost" data-game-back>← Tilbage</button></div></div>
 </div>
 <script>
 const storageKey="skolehub-links-v1";const defaults=[{id:"default-aula",name:"Aula",url:"https://www.aula.dk/"},{id:"default-meebook",name:"Meebook",url:"https://www.meebook.com/"},{id:"default-classroom",name:"Google Classroom",url:"https://classroom.google.com/"}];let links=[];try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");if(Array.isArray(saved))links=saved.filter(x=>x&&typeof x.name==="string"&&typeof x.url==="string");else links=[...defaults]}catch{links=[...defaults]}for(const item of defaults){if(!links.some(x=>x.id===item.id||x.name.toLowerCase()===item.name.toLowerCase()))links.push(item)}localStorage.setItem(storageKey,JSON.stringify(links));let editing=null;
@@ -527,15 +529,16 @@ const geoRaw={
 };
 let geoLevelId="easy",geoLevel=geoRaw.easy,geo=null,geoFrame=0,geoLast=0,geoBest=0,geoAttempt=0,geoParticles=[],geoHeld=false,geoSoundOn=false,geoAudio=null;
 const geoPlayerX=140,geoGravity=1900,geoJumpSpeed=-650;
+let geoPractice=false,geoCheckpoint=0,geoCheckpointAt=0;
 function geometryStop(){if(geoFrame)cancelAnimationFrame(geoFrame);geoFrame=0;geoLast=0;geoHeld=false}
 function geoChooseLevel(id){
- geoLevelId=Object.hasOwn(geoRaw,id)?id:"easy";geoLevel=geoRaw[geoLevelId];geoAttempt=0;geoBest=0;
+ geoLevelId=Object.hasOwn(geoRaw,id)?id:"easy";geoLevel=geoRaw[geoLevelId];geoAttempt=0;geoBest=0;geoCheckpoint=0;geoCheckpointAt=0;
  try{geoBest=Number(localStorage.getItem("skoleboard-geometry-best-"+geoLevelId+"-v1"))||0}catch{}
  el("geometryLevelInfo").textContent=geoLevel.name+" · "+geoLevel.obstacles.length+" forhindringer · Rekord "+geoBest+"%";
 }
 function geoReset(){
  geometryStop();geoAttempt++;geoParticles=[];
- geo={y:GROUND-CUBE,vy:0,angle:0,grounded:true,started:false,over:false,won:false,scroll:0,progress:0,acc:0,shake:0,trail:[],jumpBuffer:0,coyote:0};
+ geo={y:GROUND-CUBE,vy:0,angle:0,grounded:true,started:false,over:false,won:false,scroll:geoPractice?geoCheckpoint:0,progress:geoPractice?Math.floor(100*geoCheckpoint/geoLevel.finish):0,acc:0,shake:0,trail:[],jumpBuffer:0,coyote:0};
  el("geometryStatus").textContent="Forsøg "+geoAttempt+" · Rekord "+geoBest+"% · Tryk for at starte";
  geoDraw();geoFrame=requestAnimationFrame(geoLoop);
 }
@@ -569,6 +572,7 @@ function geoUpdate(dt){
  geoParticles=geoParticles.filter(p=>p.life>0);
  if(!geo||!geo.started||geo.over||geo.won)return;
  geo.scroll+=geoLevel.speed*dt;
+ if(geoPractice&&geo.scroll-geoCheckpointAt>650){geoCheckpointAt=geo.scroll;geoCheckpoint=Math.max(0,geo.scroll-200)}
  geo.progress=Math.min(100,Math.floor(100*geo.scroll/geoLevel.finish));
  geo.jumpBuffer=Math.max(0,geo.jumpBuffer-dt);
  geo.coyote=geo.grounded?.07:Math.max(0,geo.coyote-dt);
@@ -580,7 +584,12 @@ function geoUpdate(dt){
  else{geo.grounded=false;geo.angle+=dt*8.6}
  if(geoHeld&&geo.grounded&&geo.jumpBuffer<=0)geoDoJump();
  for(const o of geoLevel.obstacles){if(o[0]<geo.scroll+geoPlayerX-55||o[0]>geo.scroll+geoPlayerX+55)continue;
+ const left=o[0]-geo.scroll;
+ if(o[1]==="b"&&geo.vy>=0&&geo.y+CUBE>=GROUND-40&&geo.y+CUBE-geo.vy*dt<=GROUND-40+5&&geoPlayerX+CUBE>left+3&&geoPlayerX<left+37){
+ geo.y=GROUND-40-CUBE;geo.vy=0;geo.grounded=true;geo.angle=Math.round(geo.angle/(Math.PI/2))*(Math.PI/2);continue}
  if(geoCollides(o)){geo.over=true;geo.shake=10;geoBurst(geoPlayerX+15,geo.y+15,36,"#a3ff3a");geoTone(130,.23);break}}
+ // Land on blocks while staying on their top surface.
+ if(geo.grounded&&geo.y<GROUND-CUBE-1){const supported=geoLevel.obstacles.some(o=>o[1]==="b"&&geoPlayerX+CUBE>o[0]-geo.scroll+3&&geoPlayerX<o[0]-geo.scroll+37&&Math.abs(geo.y+CUBE-(GROUND-40))<2);if(!supported)geo.grounded=false}
  if(geo.progress>geoBest){geoBest=geo.progress;try{localStorage.setItem("skoleboard-geometry-best-"+geoLevelId+"-v1",String(geoBest))}catch{}}
  if(geo.scroll>=geoLevel.finish){geo.won=true;geoBurst(geoPlayerX+15,geo.y+15,45,"#ffe77a");geoTone(780,.3)}
  if(geo.over)el("geometryStatus").textContent="💥 Forsøg "+geoAttempt+" · "+geo.progress+"% · Tryk for at prøve igen";
@@ -607,6 +616,7 @@ function geoDraw(){
  else g.rect(x,GROUND-40,40,40);
  g.closePath();g.fill();g.stroke();
  if(o[1]==="b"){g.strokeStyle="#25dff3";g.lineWidth=2;g.strokeRect(x+7,GROUND-33,26,26)}}
+ if(geoPractice&&geoCheckpoint>0){const checkpointX=geoCheckpoint+geoPlayerX-scroll;if(checkpointX>-20&&checkpointX<GW){g.strokeStyle="#ffe05b";g.lineWidth=3;g.beginPath();g.moveTo(checkpointX,GROUND-80);g.lineTo(checkpointX,GROUND);g.stroke();g.font="24px system-ui";g.fillText("⚑",checkpointX-5,GROUND-84)}}
  const finishX=geoLevel.finish+geoPlayerX-scroll;if(finishX<GW){g.fillStyle="#ffdc64";g.fillRect(finishX,GROUND-115,6,115);g.font="32px system-ui";g.fillText("🏁",finishX-13,GROUND-120)}
  // The cube rotates exactly 90° increments during jumps.
  g.save();g.translate(geoPlayerX+CUBE/2,geo.y+CUBE/2);g.rotate(geo.angle);
@@ -616,7 +626,7 @@ function geoDraw(){
  for(const p of geoParticles){g.globalAlpha=Math.min(1,p.life/.5);g.fillStyle=p.color;g.fillRect(p.x,p.y,p.size,p.size)}g.globalAlpha=1;
  g.fillStyle="#001b2da9";g.fillRect(215,15,330,13);g.fillStyle="#79f6e7";g.fillRect(215,15,330*geo.progress/100,13);g.strokeStyle="#fff";g.lineWidth=1;g.strokeRect(215,15,330,13);
  g.fillStyle="#fff";g.textAlign="center";g.font="bold 16px system-ui";g.fillText(geo.progress+"%",380,48);
- g.textAlign="left";g.font="bold 15px system-ui";g.fillText("FORSØG "+geoAttempt,15,25);g.fillText(geoLevel.name.toUpperCase(),15,48);
+ g.textAlign="left";g.font="bold 15px system-ui";g.fillText("FORSØG "+geoAttempt,15,25);if(geoPractice){g.fillStyle="#ffe47b";g.fillText("PRACTICE",15,71);g.fillStyle="#fff"}g.fillText(geoLevel.name.toUpperCase(),15,48);
  if(!geo.started||geo.over||geo.won){g.fillStyle="#001522c9";g.fillRect(164,88,432,120);g.strokeStyle="#72e9fa";g.strokeRect(164,88,432,120);
  g.textAlign="center";g.fillStyle="#fff";g.font="bold 29px system-ui";g.fillText(geo.won?"BANE GENNEMFØRT!":geo.over?"CRASH!":"NEON DASH",380,132);
  g.font="16px system-ui";g.fillText(geo.won?"100% – godt klaret!":geo.over?"Tryk for at prøve igen":"Tryk eller hold mellemrum for at hoppe",380,168)}
@@ -628,7 +638,9 @@ function geoLoop(t){if(arcadeMode!=="geometry")return;if(!geoLast)geoLast=t;
  geoDraw();geoFrame=requestAnimationFrame(geoLoop)}
 el("playGeometry").onclick=()=>{arcadeOpen("geometryScreen");arcadeMode="geometry";geoChooseLevel(el("geometryLevel").value);geoReset()};
 el("geometryLevel").addEventListener("change",e=>{if(arcadeMode==="geometry"){geoChooseLevel(e.target.value);geoReset()}});
-el("geometryRestart").onclick=()=>{arcadeMode="geometry";geoReset()};
+el("geometryRestart").onclick=()=>{arcadeMode="geometry";geoCheckpoint=0;geoCheckpointAt=0;geoReset()};
+el("geometryPractice").addEventListener("change",e=>{geoPractice=e.target.checked;geoCheckpoint=0;geoCheckpointAt=0;if(arcadeMode==="geometry")geoReset()});
+el("geometrySound").addEventListener("change",e=>{geoSoundOn=e.target.checked});
 geometryCanvas.addEventListener("pointerdown",e=>{e.preventDefault();geoHeld=true;geoJump()});
 window.addEventListener("pointerup",()=>{geoHeld=false});
 document.addEventListener("keydown",e=>{if(arcadeMode!=="geometry"||el("gamesModal").classList.contains("hidden"))return;
