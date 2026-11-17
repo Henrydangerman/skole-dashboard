@@ -212,7 +212,7 @@ body{transition:background-color .65s ease,color .45s ease}
   
   
   <div id="snakeScreen" class="hidden"><canvas id="snakeCanvas" width="320" height="320" aria-label="Snake spil"></canvas><p class="gameHint">Brug piletasterne eller WASD. På mobil: swipe for at styre.</p><p id="snakeRecord" class="gameHint">🏆 Rekord: 0</p><button id="snakeRestart" class="primary" type="button">Start forfra</button> <button id="snakeBack" class="ghost" type="button">← Tilbage til spil</button></div>
- <div id="pongScreen" class="hidden"><canvas id="pongCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt musen eller fingeren for at styre battet. Først til 5 vinder!</p><button id="pongRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="breakoutScreen" class="hidden"><canvas id="breakoutCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt battet med musen eller fingeren, og slå alle klodserne væk.</p><button id="breakoutRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="geometryScreen" class="hidden"><div class="geo-level-picker"><label for="geometryLevel">🎮 Vælg bane</label><select id="geometryLevel"><option value="easy">🟢 Easy – First Steps</option><option value="normal">🔵 Normal – Neon Run</option><option value="hard">🟠 Hard – Spike Rush</option><option value="insane">🔴 Insane – Final Challenge</option></select><p id="geometryLevelInfo" class="gameHint">4 forskellige baner med stigende sværhedsgrad.</p></div><canvas id="geometryCanvas" width="760" height="340" aria-label="Geometry Dash-inspireret platformspil"></canvas><p class="gameHint">Mellemrum, ↑, W eller tryk på spillet for at hoppe. Undgå piggene, og nå målet!</p><p id="geometryStatus" class="gameHint" role="status" aria-live="polite">Klar til at spille</p><button id="geometryRestart" class="primary" type="button">↻ Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="dinoScreen" class="hidden"><canvas id="dinoCanvas" width="600" height="220" aria-label="Dinosaur løbespil"></canvas><p class="gameHint">Mellemrum / ↑ = hop · ↓ = duk dig · klik eller tryk = hop.</p><p class="gameHint" id="dinoRecord"></p><button id="dinoRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="ticScreen" class="hidden"><p class="gameHint" id="ticStatus">Din tur: ❌</p><div id="ticGrid" class="tic-grid"></div><button id="ticRestart" class="primary">Nyt spil</button> <button class="ghost" data-game-back>← Tilbage</button></div></div>
+ <div id="pongScreen" class="hidden"><canvas id="pongCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt musen eller fingeren for at styre battet. Først til 5 vinder!</p><button id="pongRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="breakoutScreen" class="hidden"><canvas id="breakoutCanvas" width="360" height="400"></canvas><p class="gameHint">Flyt battet med musen eller fingeren, og slå alle klodserne væk.</p><button id="breakoutRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="geometryScreen" class="hidden"><div class="geo-level-picker"><label for="geometryLevel">🎮 Vælg bane</label><select id="geometryLevel"><option value="easy">🟢 Easy – First Steps</option><option value="normal">🔵 Normal – Neon Run</option><option value="hard">🟠 Hard – Spike Rush</option><option value="insane">🔴 Insane – Final Challenge</option></select><p id="geometryLevelInfo" class="gameHint">4 forskellige baner med stigende sværhedsgrad.</p></div><canvas id="geometryCanvas" width="760" height="340" aria-label="Geometry Dash-inspireret platformspil"></canvas><p class="gameHint">Hold mellemrum, ↑, W eller fingeren nede for gentagne hop. Slip for at stoppe. Undgå pigge og blokke!</p><p id="geometryStatus" class="gameHint" role="status" aria-live="polite">Klar til at spille</p><button id="geometryRestart" class="primary" type="button">↻ Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="dinoScreen" class="hidden"><canvas id="dinoCanvas" width="600" height="220" aria-label="Dinosaur løbespil"></canvas><p class="gameHint">Mellemrum / ↑ = hop · ↓ = duk dig · klik eller tryk = hop.</p><p class="gameHint" id="dinoRecord"></p><button id="dinoRestart" class="primary">Start forfra</button> <button class="ghost" data-game-back>← Tilbage</button></div><div id="ticScreen" class="hidden"><p class="gameHint" id="ticStatus">Din tur: ❌</p><div id="ticGrid" class="tic-grid"></div><button id="ticRestart" class="primary">Nyt spil</button> <button class="ghost" data-game-back>← Tilbage</button></div></div>
 </div>
 <script>
 const storageKey="skolehub-links-v1";const defaults=[{id:"default-aula",name:"Aula",url:"https://www.aula.dk/"},{id:"default-meebook",name:"Meebook",url:"https://www.meebook.com/"},{id:"default-classroom",name:"Google Classroom",url:"https://classroom.google.com/"}];let links=[];try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");if(Array.isArray(saved))links=saved.filter(x=>x&&typeof x.name==="string"&&typeof x.url==="string");else links=[...defaults]}catch{links=[...defaults]}for(const item of defaults){if(!links.some(x=>x.id===item.id||x.name.toLowerCase()===item.name.toLowerCase()))links.push(item)}localStorage.setItem(storageKey,JSON.stringify(links));let editing=null;
@@ -516,105 +516,124 @@ el("playTic").onclick=()=>{arcadeOpen("ticScreen");ticStart()};el("ticRestart").
 
 
 
-/* Neon cube runner – original mini-level inspired by rhythm platformers. */
+/* Neon Dash – custom rhythm-platformer with deterministic physics and original artwork. */
 const geometryCanvas=el("geometryCanvas"),gg=geometryCanvas.getContext("2d");
-const GW=760,GH=340,GROUND=276,CUBE=31,GEOSPEED=4.5,GEOGRAVITY=.64,GEOJUMP=-12.6;
-const geoOriginalPattern=[
-[370,"spike"],[515,"spike"],[550,"spike"],[745,"block"],[950,"spike"],[985,"spike"],
-[1190,"spike"],[1340,"block"],[1480,"spike"],[1515,"spike"],[1550,"spike"],
-[1770,"block"],[1980,"spike"],[2120,"spike"],[2155,"spike"],[2380,"block"],
-[2560,"spike"],[2595,"spike"],[2800,"spike"],[2960,"block"],[3130,"spike"],
-[3165,"spike"],[3370,"spike"],[3405,"spike"],[3600,"block"],[3780,"spike"],
-[3815,"spike"],[4020,"spike"],[4180,"spike"],[4215,"spike"],[4400,"block"],
-[4590,"spike"],[4625,"spike"],[4810,"spike"],[4845,"spike"],[4880,"spike"]
-].map(([x,type])=>({x,type,w:type==="block"?37:35,h:type==="block"?39:33}));
-const geoLevels={
- easy:{name:"First Steps",speed:3.7,finish:3200,sky:["#135d65","#28b7a6"],pattern:[[370,"spike"],[620,"spike"],[850,"block"],[1110,"spike"],[1360,"spike"],[1400,"spike"],[1700,"block"],[1940,"spike"],[2220,"spike"],[2470,"block"],[2720,"spike"],[2990,"spike"]]},
- normal:{name:"Neon Run",speed:4.5,finish:5150,sky:["#063d51","#087e95"],pattern:geoOriginalPattern.map(o=>[o.x,o.type])},
- hard:{name:"Spike Rush",speed:5.2,finish:4500,sky:["#582d25","#e17c38"],pattern:[[360,"spike"],[395,"spike"],[590,"block"],[790,"spike"],[825,"spike"],[1080,"spike"],[1115,"spike"],[1150,"spike"],[1420,"block"],[1640,"spike"],[1675,"spike"],[1880,"block"],[2080,"spike"],[2115,"spike"],[2150,"spike"],[2440,"spike"],[2475,"spike"],[2720,"block"],[2950,"spike"],[2985,"spike"],[3220,"spike"],[3255,"spike"],[3290,"spike"],[3590,"block"],[3800,"spike"],[3835,"spike"],[4080,"spike"],[4115,"spike"]]},
- insane:{name:"Final Challenge",speed:5.8,finish:4800,sky:["#34134c","#b52f7e"],pattern:[[350,"spike"],[385,"spike"],[610,"spike"],[645,"spike"],[680,"spike"],[960,"block"],[1180,"spike"],[1215,"spike"],[1480,"spike"],[1515,"spike"],[1550,"spike"],[1820,"block"],[2020,"spike"],[2055,"spike"],[2090,"spike"],[2380,"spike"],[2415,"spike"],[2650,"block"],[2860,"spike"],[2895,"spike"],[2930,"spike"],[3200,"spike"],[3235,"spike"],[3500,"block"],[3710,"spike"],[3745,"spike"],[3780,"spike"],[4040,"spike"],[4075,"spike"],[4340,"block"],[4540,"spike"],[4575,"spike"]]}
+const GW=760,GH=340,GROUND=276,CUBE=30,STEP=1/60;
+const geoRaw={
+ easy:{name:"First Steps",speed:205,finish:3450,sky:["#06586c","#12a4b3"],obstacles:[[440,"s"],[720,"s"],[1010,"s"],[1050,"s"],[1390,"b"],[1710,"s"],[1990,"s"],[2030,"s"],[2370,"b"],[2690,"s"],[2990,"s"],[3030,"s"]]},
+ normal:{name:"Neon Run",speed:235,finish:4800,sky:["#063c67","#0b9cbe"],obstacles:[[430,"s"],[670,"s"],[710,"s"],[990,"b"],[1260,"s"],[1300,"s"],[1590,"s"],[1630,"s"],[1670,"s"],[1990,"b"],[2260,"s"],[2300,"s"],[2600,"s"],[2900,"b"],[3170,"s"],[3210,"s"],[3490,"s"],[3530,"s"],[3570,"s"],[3910,"b"],[4180,"s"],[4220,"s"],[4510,"s"]]},
+ hard:{name:"Spike Rush",speed:260,finish:4800,sky:["#5b214b","#e26d53"],obstacles:[[420,"s"],[460,"s"],[750,"s"],[790,"s"],[830,"s"],[1150,"b"],[1420,"s"],[1460,"s"],[1750,"s"],[1790,"s"],[1830,"s"],[2150,"b"],[2420,"s"],[2460,"s"],[2750,"s"],[2790,"s"],[2830,"s"],[3160,"b"],[3440,"s"],[3480,"s"],[3780,"s"],[3820,"s"],[3860,"s"],[4200,"b"],[4470,"s"],[4510,"s"]]},
+ insane:{name:"Final Challenge",speed:290,finish:5200,sky:["#341452","#b52d8d"],obstacles:[[430,"s"],[470,"s"],[780,"s"],[820,"s"],[860,"s"],[1210,"b"],[1510,"s"],[1550,"s"],[1590,"s"],[1950,"s"],[1990,"s"],[2030,"s"],[2380,"b"],[2670,"s"],[2710,"s"],[2750,"s"],[3090,"s"],[3130,"s"],[3170,"s"],[3530,"b"],[3820,"s"],[3860,"s"],[3900,"s"],[4250,"s"],[4290,"s"],[4330,"s"],[4680,"b"],[4950,"s"],[4990,"s"]]}
 };
-let geoLevelId="easy",geoPattern=[],geoFinish=3200,geoSpeed=3.7,geoSky=["#135d65","#28b7a6"];
-function geoChooseLevel(id){geoLevelId=Object.hasOwn(geoLevels,id)?id:"easy";const level=geoLevels[geoLevelId];geoPattern=level.pattern.map(([x,type])=>({x,type,w:type==="block"?37:35,h:type==="block"?39:33}));geoFinish=level.finish;geoSpeed=level.speed;geoSky=level.sky;geoBest=0;geoAttempt=0;try{geoBest=Number(localStorage.getItem("skoleboard-geometry-best-"+geoLevelId+"-v1"))||0}catch{}el("geometryLevelInfo").textContent=level.name+" · "+level.pattern.length+" forhindringer · Rekord: "+geoBest+"%";}
-
-let geo=null,geoFrame=0,geoLast=0,geoBest=0,geoAttempt=0,geoParticles=[];
-function geometryStop(){if(geoFrame)cancelAnimationFrame(geoFrame);geoFrame=0;geoLast=0}
+let geoLevelId="easy",geoLevel=geoRaw.easy,geo=null,geoFrame=0,geoLast=0,geoBest=0,geoAttempt=0,geoParticles=[],geoHeld=false,geoSoundOn=false,geoAudio=null;
+const geoPlayerX=140,geoGravity=1900,geoJumpSpeed=-650;
+function geometryStop(){if(geoFrame)cancelAnimationFrame(geoFrame);geoFrame=0;geoLast=0;geoHeld=false}
+function geoChooseLevel(id){
+ geoLevelId=Object.hasOwn(geoRaw,id)?id:"easy";geoLevel=geoRaw[geoLevelId];geoAttempt=0;geoBest=0;
+ try{geoBest=Number(localStorage.getItem("skoleboard-geometry-best-"+geoLevelId+"-v1"))||0}catch{}
+ el("geometryLevelInfo").textContent=geoLevel.name+" · "+geoLevel.obstacles.length+" forhindringer · Rekord "+geoBest+"%";
+}
 function geoReset(){
  geometryStop();geoAttempt++;geoParticles=[];
- geo={x:70,y:GROUND-CUBE,vy:0,angle:0,grounded:true,started:false,over:false,won:false,scroll:0,progress:0,flash:0};
- el("geometryStatus").textContent="Forsøg "+geoAttempt+" · Rekord "+geoBest+"% · Tryk for at hoppe";
+ geo={y:GROUND-CUBE,vy:0,angle:0,grounded:true,started:false,over:false,won:false,scroll:0,progress:0,acc:0,shake:0,trail:[],jumpBuffer:0,coyote:0};
+ el("geometryStatus").textContent="Forsøg "+geoAttempt+" · Rekord "+geoBest+"% · Tryk for at starte";
  geoDraw();geoFrame=requestAnimationFrame(geoLoop);
 }
+function geoTone(freq=450,duration=.07){
+ if(!geoSoundOn)return;
+ try{geoAudio??=new(window.AudioContext||window.webkitAudioContext)();if(geoAudio.state==="suspended")geoAudio.resume();
+ const osc=geoAudio.createOscillator(),gain=geoAudio.createGain();osc.type="square";osc.frequency.setValueAtTime(freq,geoAudio.currentTime);
+ gain.gain.setValueAtTime(.045,geoAudio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,geoAudio.currentTime+duration);
+ osc.connect(gain);gain.connect(geoAudio.destination);osc.start();osc.stop(geoAudio.currentTime+duration)}catch{}
+}
+function geoBurst(x,y,n,color){for(let i=0;i<n;i++)geoParticles.push({x,y,vx:(Math.random()-.5)*230,vy:(Math.random()-.5)*230,life:.6,color,size:3+Math.random()*5})}
 function geoJump(){
  if(arcadeMode!=="geometry"||!geo)return;
  if(geo.over||geo.won){geoReset();return}
- geo.started=true;
- if(geo.grounded){geo.vy=GEOJUMP;geo.grounded=false;geoBurst(70,GROUND-CUBE/2,7,"#a8ff5c")}
+ geo.started=true;geo.jumpBuffer=.13;
+ if(geo.grounded||geo.coyote>0)geoDoJump();
 }
-function geoBurst(x,y,n,color){for(let i=0;i<n;i++)geoParticles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,life:28,color})}
-function geoHit(o,px,py){
- const ox=o.x-geo.scroll,top=GROUND-o.h;
- if(o.type==="block")return px+26>ox+3&&px+5<ox+o.w-3&&py+CUBE-3>top+3&&py+4<GROUND;
- // Narrow triangular collision box avoids unfair hits at spike tips.
- return px+24>ox+9&&px+7<ox+o.w-9&&py+CUBE-3>GROUND-22;
+function geoDoJump(){geo.vy=geoJumpSpeed;geo.grounded=false;geo.coyote=0;geo.jumpBuffer=0;geoBurst(geoPlayerX+15,GROUND-5,9,"#8eff54");geoTone(440)}
+function geoCollides(o){
+ const x=o[0]-geo.scroll,y=geo.y,px=geoPlayerX+4,pw=CUBE-8;
+ if(o[1]==="b")return px+pw>x+3&&px<x+37&&y+CUBE-3>GROUND-40&&y+3<GROUND;
+ // Narrow spike collision based on triangular shape, not its bounding box.
+ const overlapLeft=Math.max(px,x+5),overlapRight=Math.min(px+pw,x+35);
+ if(overlapLeft>=overlapRight)return false;
+ const center=(overlapLeft+overlapRight)/2-x;
+ const spikeTop=GROUND-35*(1-Math.abs(center-20)/20);
+ return y+CUBE-4>spikeTop+4&&y<GROUND-3;
 }
-function geoUpdate(){
+function geoUpdate(dt){
+ for(const p of geoParticles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=420*dt;p.life-=dt}
+ geoParticles=geoParticles.filter(p=>p.life>0);
  if(!geo||!geo.started||geo.over||geo.won)return;
- geo.scroll+=geoSpeed;geo.progress=Math.min(100,Math.floor(geo.scroll/geoFinish*100));
- geo.vy+=GEOGRAVITY;geo.y+=geo.vy;
- if(geo.y>=GROUND-CUBE){geo.y=GROUND-CUBE;geo.vy=0;geo.grounded=true;geo.angle=Math.round(geo.angle/(Math.PI/2))*(Math.PI/2)}
- else {geo.grounded=false;geo.angle+=.09}
- for(const o of geoPattern){if(o.x-geo.scroll>115||o.x+o.w-geo.scroll<45)continue;
-  if(geoHit(o,70,geo.y)){geo.over=true;geo.flash=18;geoBurst(86,geo.y+16,28,"#8cff36");break}
- }
+ geo.scroll+=geoLevel.speed*dt;
+ geo.progress=Math.min(100,Math.floor(100*geo.scroll/geoLevel.finish));
+ geo.jumpBuffer=Math.max(0,geo.jumpBuffer-dt);
+ geo.coyote=geo.grounded?.07:Math.max(0,geo.coyote-dt);
+ if(geo.jumpBuffer>0&&(geo.grounded||geo.coyote>0))geoDoJump();
+ const wasGrounded=geo.grounded;
+ geo.vy+=geoGravity*dt;geo.y+=geo.vy*dt;
+ if(geo.y>=GROUND-CUBE){geo.y=GROUND-CUBE;geo.vy=0;geo.grounded=true;
+ if(!wasGrounded){geo.angle=Math.round(geo.angle/(Math.PI/2))*(Math.PI/2);geoBurst(geoPlayerX+15,GROUND,6,"#61edff")}}
+ else{geo.grounded=false;geo.angle+=dt*8.6}
+ if(geoHeld&&geo.grounded&&geo.jumpBuffer<=0)geoDoJump();
+ for(const o of geoLevel.obstacles){if(o[0]<geo.scroll+geoPlayerX-55||o[0]>geo.scroll+geoPlayerX+55)continue;
+ if(geoCollides(o)){geo.over=true;geo.shake=10;geoBurst(geoPlayerX+15,geo.y+15,36,"#a3ff3a");geoTone(130,.23);break}}
  if(geo.progress>geoBest){geoBest=geo.progress;try{localStorage.setItem("skoleboard-geometry-best-"+geoLevelId+"-v1",String(geoBest))}catch{}}
- if(geo.scroll>=geoFinish){geo.won=true;geoBurst(85,geo.y+12,35,"#fff46d")}
- if(geo.over)el("geometryStatus").textContent="💥 Du ramte en forhindring! "+geo.progress+"% · Tryk for at prøve igen";
- else if(geo.won)el("geometryStatus").textContent="🏆 Bane gennemført! 100% · Tryk for at spille igen";
- else if(Math.floor(geo.scroll)%45<geoSpeed)el("geometryStatus").textContent="Forsøg "+geoAttempt+" · "+geo.progress+"% · Rekord "+geoBest+"%";
+ if(geo.scroll>=geoLevel.finish){geo.won=true;geoBurst(geoPlayerX+15,geo.y+15,45,"#ffe77a");geoTone(780,.3)}
+ if(geo.over)el("geometryStatus").textContent="💥 Forsøg "+geoAttempt+" · "+geo.progress+"% · Tryk for at prøve igen";
+ else if(geo.won)el("geometryStatus").textContent="🏆 "+geoLevel.name+" gennemført! 100%";
+ else if(Math.floor(geo.scroll/50)!==Math.floor((geo.scroll-geoLevel.speed*dt)/50))el("geometryStatus").textContent="Forsøg "+geoAttempt+" · "+geo.progress+"% · Rekord "+geoBest+"%";
 }
 function geoDraw(){
- const g=gg;if(!geo)return;
- const sky=g.createLinearGradient(0,0,0,GROUND);sky.addColorStop(0,geoSky[0]);sky.addColorStop(1,geoSky[1]);g.fillStyle=sky;g.fillRect(0,0,GW,GH);
- const offset=geo.scroll*.28;
- g.lineWidth=5;g.strokeStyle="#1b9bb0";g.fillStyle="#0b6074";
- for(let i=-1;i<9;i++){const x=i*115-offset%115;const h=90+(i*37%110);g.fillRect(x,GROUND-h,103,h);g.strokeRect(x,GROUND-h,103,h);g.strokeRect(x+17,GROUND-h+17,65,Math.max(20,h-37))}
- g.fillStyle="#062c42";g.fillRect(0,GROUND,GW,GH-GROUND);
- g.strokeStyle="#3be5f5";g.lineWidth=3;g.beginPath();g.moveTo(0,GROUND);g.lineTo(GW,GROUND);g.stroke();
- g.strokeStyle="#14758c";g.lineWidth=1;
- for(let x=-(geo.scroll%22);x<GW;x+=22){g.beginPath();g.moveTo(x,GROUND);g.lineTo(x,GH);g.stroke()}
- for(let y=GROUND+13;y<GH;y+=13){g.beginPath();g.moveTo(0,y);g.lineTo(GW,y);g.stroke()}
- for(const o of geoPattern){const x=o.x-geo.scroll;if(x<-50||x>GW+40)continue;
-  g.fillStyle="#031d2d";g.strokeStyle="#f1ffff";g.lineWidth=2.5;g.beginPath();
-  if(o.type==="spike"){g.moveTo(x,GROUND);g.lineTo(x+o.w/2,GROUND-o.h);g.lineTo(x+o.w,GROUND)}
-  else g.rect(x,GROUND-o.h,o.w,o.h);
-  g.closePath();g.fill();g.stroke();
-  if(o.type==="block"){g.strokeStyle="#25d2ea";g.strokeRect(x+7,GROUND-o.h+7,o.w-14,o.h-14)}
- }
- const finishX=geoFinish+70-geo.scroll;
- if(finishX<GW){g.fillStyle="#f8d95c";g.fillRect(finishX,GROUND-110,7,110);g.font="34px system-ui";g.fillText("🏁",finishX-10,GROUND-110)}
- g.save();g.translate(85,geo.y+CUBE/2);g.rotate(geo.angle);
- g.fillStyle="#68f51d";g.fillRect(-15,-15,30,30);g.strokeStyle="#043a38";g.lineWidth=3;g.strokeRect(-15,-15,30,30);
- g.fillStyle="#073b42";g.fillRect(-9,-8,7,9);g.fillRect(3,-8,7,9);g.fillRect(-9,6,19,3);g.fillRect(-9,3,3,4);g.fillRect(7,3,3,4);
- g.fillStyle="#b9ff8d";g.fillRect(-10,-10,4,4);g.restore();
- geoParticles=geoParticles.filter(p=>p.life-->0);
- for(const p of geoParticles){p.x+=p.vx;p.y+=p.vy;p.vy+=.13;g.globalAlpha=Math.max(0,p.life/28);g.fillStyle=p.color;g.fillRect(p.x,p.y,5,5)}g.globalAlpha=1;
- g.fillStyle="#07344bbd";g.fillRect(220,14,320,15);g.fillStyle="#72f1ed";g.fillRect(220,14,320*geo.progress/100,15);
- g.strokeStyle="#d7faff";g.lineWidth=1;g.strokeRect(220,14,320,15);
- g.font="bold 17px system-ui";g.textAlign="center";g.fillStyle="#fff";g.fillText(geo.progress+"%",380,51);
- g.textAlign="left";g.font="bold 15px system-ui";g.fillText("FORSØG "+geoAttempt,15,26);
- if(!geo.started||geo.over||geo.won){g.fillStyle="#001522b9";g.fillRect(170,91,420,105);g.textAlign="center";g.fillStyle="#fff";g.font="bold 27px system-ui";g.fillText(geo.won?"BANE GENNEMFØRT!":geo.over?"FORSØG IGEN":"NEON DASH",380,131);g.font="16px system-ui";g.fillText(geo.won?"Du klarede det!":"Mellemrum / klik for at "+(geo.over?"genstarte":"hoppe"),380,163);g.textAlign="left"}
+ if(!geo)return;const g=gg,scroll=geo.scroll;
+ g.save();if(geo.shake>0){g.translate((Math.random()-.5)*geo.shake,(Math.random()-.5)*geo.shake);geo.shake*=.75}
+ const sky=g.createLinearGradient(0,0,0,GROUND);sky.addColorStop(0,geoLevel.sky[0]);sky.addColorStop(1,geoLevel.sky[1]);g.fillStyle=sky;g.fillRect(0,0,GW,GH);
+ // Parallax paneled city, inspired by the supplied screenshot.
+ g.fillStyle="#07394a44";g.strokeStyle="#39b6cc99";g.lineWidth=5;
+ for(let i=-2;i<11;i++){const x=i*112-(scroll*.22%112),h=95+((i+30)*47%105);
+ g.fillRect(x,GROUND-h,108,h);g.strokeRect(x,GROUND-h,108,h);
+ g.lineWidth=3;g.strokeRect(x+13,GROUND-h+12,82,Math.max(30,h-27));g.lineWidth=5}
+ g.fillStyle="#06283b";g.fillRect(0,GROUND,GW,GH-GROUND);
+ g.strokeStyle="#20b6d0";g.lineWidth=1;
+ for(let x=-(scroll%22);x<GW;x+=22){g.beginPath();g.moveTo(x,GROUND);g.lineTo(x,GH);g.stroke()}
+ for(let y=GROUND+12;y<GH;y+=12){g.beginPath();g.moveTo(0,y);g.lineTo(GW,y);g.stroke()}
+ g.strokeStyle="#b9ffff";g.lineWidth=3;g.beginPath();g.moveTo(0,GROUND);g.lineTo(GW,GROUND);g.stroke();
+ for(const o of geoLevel.obstacles){const x=o[0]-scroll;if(x<-50||x>GW+40)continue;
+ g.lineWidth=2.5;g.fillStyle="#03243b";g.strokeStyle="#eaffff";g.beginPath();
+ if(o[1]==="s"){g.moveTo(x,GROUND);g.lineTo(x+20,GROUND-35);g.lineTo(x+40,GROUND)}
+ else g.rect(x,GROUND-40,40,40);
+ g.closePath();g.fill();g.stroke();
+ if(o[1]==="b"){g.strokeStyle="#25dff3";g.lineWidth=2;g.strokeRect(x+7,GROUND-33,26,26)}}
+ const finishX=geoLevel.finish+geoPlayerX-scroll;if(finishX<GW){g.fillStyle="#ffdc64";g.fillRect(finishX,GROUND-115,6,115);g.font="32px system-ui";g.fillText("🏁",finishX-13,GROUND-120)}
+ // The cube rotates exactly 90° increments during jumps.
+ g.save();g.translate(geoPlayerX+CUBE/2,geo.y+CUBE/2);g.rotate(geo.angle);
+ g.shadowColor="#81ff40";g.shadowBlur=15;g.fillStyle="#70f522";g.fillRect(-15,-15,30,30);g.shadowBlur=0;
+ g.strokeStyle="#053c39";g.lineWidth=3;g.strokeRect(-15,-15,30,30);
+ g.fillStyle="#064349";g.fillRect(-9,-8,7,9);g.fillRect(3,-8,7,9);g.fillRect(-9,6,19,3);g.fillRect(-9,3,3,4);g.fillRect(7,3,3,4);g.restore();
+ for(const p of geoParticles){g.globalAlpha=Math.min(1,p.life/.5);g.fillStyle=p.color;g.fillRect(p.x,p.y,p.size,p.size)}g.globalAlpha=1;
+ g.fillStyle="#001b2da9";g.fillRect(215,15,330,13);g.fillStyle="#79f6e7";g.fillRect(215,15,330*geo.progress/100,13);g.strokeStyle="#fff";g.lineWidth=1;g.strokeRect(215,15,330,13);
+ g.fillStyle="#fff";g.textAlign="center";g.font="bold 16px system-ui";g.fillText(geo.progress+"%",380,48);
+ g.textAlign="left";g.font="bold 15px system-ui";g.fillText("FORSØG "+geoAttempt,15,25);g.fillText(geoLevel.name.toUpperCase(),15,48);
+ if(!geo.started||geo.over||geo.won){g.fillStyle="#001522c9";g.fillRect(164,88,432,120);g.strokeStyle="#72e9fa";g.strokeRect(164,88,432,120);
+ g.textAlign="center";g.fillStyle="#fff";g.font="bold 29px system-ui";g.fillText(geo.won?"BANE GENNEMFØRT!":geo.over?"CRASH!":"NEON DASH",380,132);
+ g.font="16px system-ui";g.fillText(geo.won?"100% – godt klaret!":geo.over?"Tryk for at prøve igen":"Tryk eller hold mellemrum for at hoppe",380,168)}
+ g.restore();
 }
-function geoLoop(t){if(arcadeMode!=="geometry")return;if(!geoLast)geoLast=t;const dt=Math.min(50,t-geoLast);geoLast=t;
- // Stable game speed on fast and slow monitors.
- if(!geo.acc)geo.acc=0;geo.acc+=dt;let count=0;while(geo.acc>=1000/60&&count++<3){geoUpdate();geo.acc-=1000/60}
+function geoLoop(t){if(arcadeMode!=="geometry")return;if(!geoLast)geoLast=t;
+ const dt=Math.min(.05,(t-geoLast)/1000);geoLast=t;geo.acc+=dt;
+ let steps=0;while(geo.acc>=STEP&&steps++<4){geoUpdate(STEP);geo.acc-=STEP}
  geoDraw();geoFrame=requestAnimationFrame(geoLoop)}
 el("playGeometry").onclick=()=>{arcadeOpen("geometryScreen");arcadeMode="geometry";geoChooseLevel(el("geometryLevel").value);geoReset()};
 el("geometryLevel").addEventListener("change",e=>{if(arcadeMode==="geometry"){geoChooseLevel(e.target.value);geoReset()}});
 el("geometryRestart").onclick=()=>{arcadeMode="geometry";geoReset()};
-geometryCanvas.addEventListener("pointerdown",e=>{e.preventDefault();geoJump()});
-document.addEventListener("keydown",e=>{if(arcadeMode!=="geometry"||el("gamesModal").classList.contains("hidden"))return;if(["Space","ArrowUp","KeyW"].includes(e.code)){e.preventDefault();if(!e.repeat)geoJump()}});
-
+geometryCanvas.addEventListener("pointerdown",e=>{e.preventDefault();geoHeld=true;geoJump()});
+window.addEventListener("pointerup",()=>{geoHeld=false});
+document.addEventListener("keydown",e=>{if(arcadeMode!=="geometry"||el("gamesModal").classList.contains("hidden"))return;
+ if(["Space","ArrowUp","KeyW"].includes(e.code)){e.preventDefault();if(!e.repeat){geoHeld=true;geoJump()}}});
+document.addEventListener("keyup",e=>{if(["Space","ArrowUp","KeyW"].includes(e.code))geoHeld=false});
 const dinoCanvas=el("dinoCanvas"),dg=dinoCanvas.getContext("2d");
 let dinoBest=0;try{dinoBest=Number(localStorage.getItem("skoleboard-dino-best-v1"))||0}catch{}
 let dinoDown=false;
